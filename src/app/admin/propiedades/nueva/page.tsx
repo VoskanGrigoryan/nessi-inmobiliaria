@@ -1,0 +1,22 @@
+import { BackLink } from "@/components/back-link";
+import { requireAdmin } from "@/lib/supabase/admin";
+import { saveProperty } from "@/app/admin/actions";
+import { PropertyForm } from "@/app/admin/property-form";
+
+type PageProps = { searchParams: Promise<{ error?: string }> };
+
+export const dynamic = "force-dynamic";
+
+export default async function NewPropertyPage({ searchParams }: PageProps) {
+  await requireAdmin();
+  const { error } = await searchParams;
+  const propertyId = crypto.randomUUID();
+  return (
+    <main className="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-14">
+      <BackLink href="/admin" label="Volver al panel" />
+      <h1 className="mt-5 font-editorial text-3xl text-navy">Nueva propiedad</h1>
+      {error && <p role="alert" className="mt-5 bg-red-50 p-3 text-sm text-red-800">{error === "images" ? "La propiedad puede tener hasta 20 fotos." : "Revisá los datos e intentá de nuevo."}</p>}
+      <div className="mt-8 border border-navy/10 bg-white p-5 sm:p-8"><PropertyForm propertyId={propertyId} isNew action={saveProperty} /></div>
+    </main>
+  );
+}
