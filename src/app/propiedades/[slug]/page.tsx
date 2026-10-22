@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BackLink } from "@/components/back-link";
 import { Icon } from "@/components/icon";
 import { ContactForm } from "@/components/contact-form";
 import { PropertyGallery } from "@/components/property-gallery";
+import { PropertyAdminEditLink } from "@/components/property-admin-edit-link";
 import { formatPrice, getPropertyBySlug, getWhatsAppUrl } from "@/lib/properties";
-import { isAdminUser } from "@/lib/supabase/admin";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -18,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PropertyPage({ params }: PageProps) {
   const { slug } = await params;
-  const [property, isAdmin] = await Promise.all([getPropertyBySlug(slug), isAdminUser()]);
+  const property = await getPropertyBySlug(slug);
   if (!property) notFound();
 
   const whatsappUrl = getWhatsAppUrl(`Hola, me interesa la propiedad “${property.title}” en ${property.neighborhood}. ¿Podrían enviarme más información?`);
@@ -27,10 +26,8 @@ export default async function PropertyPage({ params }: PageProps) {
     <main className="mx-auto w-full max-w-screen-2xl px-4 py-8 sm:px-5 sm:py-12 lg:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <BackLink href="/propiedades" label="Volver a propiedades" />
-        {isAdmin && property.id && (
-          <Link href={`/admin/propiedades/${property.id}/editar`} className="inline-flex cursor-pointer items-center gap-2 border border-navy/15 px-4 py-2.5 text-sm font-medium text-navy transition-colors hover:border-gold hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
-            <Icon name="edit" className="size-4" />Editar propiedad
-          </Link>
+        {property.id && (
+          <PropertyAdminEditLink propertyId={property.id} />
         )}
       </div>
 

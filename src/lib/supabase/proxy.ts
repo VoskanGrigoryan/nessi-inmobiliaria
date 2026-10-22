@@ -18,6 +18,16 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getClaims();
+  const isLoginRequest = request.nextUrl.pathname === "/admin/login";
+  const isPropertyRequest = request.nextUrl.pathname.startsWith("/propiedades/");
+  const startedAt = performance.now();
+  try {
+    await supabase.auth.getClaims();
+  } finally {
+    if (isLoginRequest || isPropertyRequest) {
+      const route = isLoginRequest ? "login" : "property-detail";
+      console.info(`[perf] supabase.proxy.getClaims route=${route} method=${request.method} duration_ms=${Math.round(performance.now() - startedAt)}`);
+    }
+  }
   return response;
 }

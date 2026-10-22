@@ -9,8 +9,6 @@ import { getProperties } from "@/lib/properties";
 const heroImage =
   "https://images.unsplash.com/photo-1665249934445-1de680641f50?auto=format&fit=crop&w=2200&q=90";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
   const properties = await getProperties();
   const isDemo =

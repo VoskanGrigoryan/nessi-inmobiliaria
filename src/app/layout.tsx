@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderAuthProvider } from "@/components/site-header-auth";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import "./globals.css";
 
@@ -16,8 +17,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es">
       <body className="flex min-h-screen flex-col bg-paper text-navy antialiased">
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">{children}</div>
+        <SiteHeaderAuthProvider>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col">{children}</div>
+        </SiteHeaderAuthProvider>
         <SiteFooter />
         <WhatsAppFloat />
       </body>

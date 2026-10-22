@@ -6,7 +6,8 @@ import { getAdminProperties, formatPrice } from "@/lib/properties";
 import { Icon } from "@/components/icon";
 import { RefreshPropertiesButton } from "@/app/admin/refresh-properties-button";
 import { AdminToast } from "@/app/admin/admin-toast";
-import { EditPropertyLink } from "@/app/admin/edit-property-link";
+import { EditPropertyLink, ViewPropertyLink } from "@/app/admin/edit-property-link";
+import { CopyPropertyLink } from "@/app/admin/copy-property-link";
 
 type PageProps = { searchParams: Promise<{ notice?: string; error?: string }> };
 
@@ -45,24 +46,23 @@ export default async function AdminPage({ searchParams }: PageProps) {
         <div className="mt-8 overflow-x-auto border border-navy/10 bg-white">
           <table className="w-full min-w-[900px] table-fixed text-left text-sm">
             <colgroup>
-              <col className="w-[46%]" /><col className="w-[12%]" /><col className="w-[15%]" />
-              <col className="w-[15%]" /><col className="w-[12%]" />
+              <col className="w-[42%]" /><col className="w-[7%]" /><col className="w-[12%]" />
+              <col className="w-[14%]" /><col className="w-[13%]" /><col className="w-[12%]" />
             </colgroup>
             <thead className="border-b border-navy/10 bg-paper text-xs uppercase tracking-wide text-muted">
-              <tr><th className="px-4 py-3">Propiedad</th><th className="px-4 py-3">Operación</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Acciones</th></tr>
+              <tr><th className="px-4 py-3">Propiedad</th><th className="px-4 py-3 text-center">Enlace</th><th className="px-4 py-3">Operación</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Acciones</th></tr>
             </thead>
             <tbody>
               {properties.map((property) => (
                 <tr key={property.id} className="border-b border-navy/10 last:border-0">
                   <td className="break-words px-4 py-4 font-medium text-navy">
                     {property.status === "published" ? (
-                      <Link href={`/propiedades/${property.slug}`} title="Ver en el sitio" className="cursor-pointer decoration-gold underline-offset-4 hover:underline focus-visible:underline">
-                        {property.title}
-                      </Link>
+                      <ViewPropertyLink href={`/propiedades/${property.slug}`} title={property.title} />
                     ) : property.title}
                     <span className="mt-1 block text-xs font-normal text-muted">{property.neighborhood}, {property.city}</span>
                     <span className="mt-1 block text-xs font-normal text-muted">{property.rooms} ambientes · {property.area} m² totales</span>
                   </td>
+                  <td className="px-4 py-4 text-center"><CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} /></td>
                   <td className="px-4 py-4 capitalize text-slate">{property.operation}</td>
                   <td className="px-4 py-4 text-slate">{formatPrice(property.price, property.currency)}</td>
                   <td className="px-4 py-4 text-slate">{property.status === "published" ? "Publicado" : "Borrador"}</td>

@@ -14,17 +14,13 @@ type SearchParams = Promise<{
 
 export default async function PropertiesPage({ searchParams }: { searchParams: SearchParams }) {
   const filters = await searchParams;
-  const properties = await getProperties();
-  const location = filters.location?.trim().toLocaleLowerCase("es-AR");
-  const minimumRooms = Number(filters.rooms) || 0;
-  const filteredProperties = properties.filter((property) => {
-    const propertyLocation = `${property.neighborhood} ${property.city}`.toLocaleLowerCase("es-AR");
-    return (
-      (!filters.operation || property.operation === filters.operation) &&
-      (!filters.type || property.type === filters.type) &&
-      (!location || propertyLocation.includes(location)) &&
-      property.rooms >= minimumRooms
-    );
+  const roomsFilter = Number(filters.rooms);
+  const minimumRooms = Number.isFinite(roomsFilter) ? roomsFilter || 0 : 0;
+  const properties = await getProperties({
+    operation: filters.operation,
+    type: filters.type,
+    minimumRooms,
+    location: filters.location,
   });
 
   return (
@@ -36,16 +32,16 @@ export default async function PropertiesPage({ searchParams }: { searchParams: S
       <div className="mt-10 flex flex-wrap items-end justify-between gap-3 border-b border-navy/10 pb-4">
         <div>
           <p className="mt-1 text-sm text-muted">
-            {filteredProperties.length} propiedades encontradas
+            {properties.length} propiedades encontradas
           </p>
         </div>
         <p className="text-sm text-muted">Valores expresados según cada aviso.</p>
       </div>
 
-      {filteredProperties.length ? (
+      {properties.length ? (
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredProperties.map((property) => (
-            <PropertyCard key={property.slug} property={property} />
+          {properties.map((property, index) => (
+            <PropertyCard key={property.slug} property={property} eager={index === 0} />
           ))}
         </div>
       ) : (
