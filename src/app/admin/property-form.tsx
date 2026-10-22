@@ -35,16 +35,16 @@ function PropertyFormActions({ uploading, property }: { uploading: boolean; prop
       : (property ? "Guardar cambios" : "Crear propiedad");
 
   return (
-    <div className="flex flex-wrap justify-end gap-3 border-t border-navy/10 pt-6">
+    <div className="grid gap-3 border-t border-navy/10 pt-6 sm:flex sm:justify-end">
       <Link
         href="/admin"
         aria-disabled={busy}
         onClick={(event) => { if (busy) event.preventDefault(); }}
-        className={`inline-flex h-12 items-center gap-2 border border-navy/20 px-5 text-sm font-semibold text-navy transition-colors hover:border-gold hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${busy ? "cursor-wait opacity-60" : "cursor-pointer"}`}
+        className={`inline-flex h-12 w-full items-center justify-center gap-2 border border-navy/20 px-5 text-sm font-semibold text-navy transition-colors hover:border-gold hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:w-auto ${busy ? "cursor-wait opacity-60" : "cursor-pointer"}`}
       >
         <Icon name="close" className="size-4" />Cancelar
       </Link>
-      <button type="submit" disabled={busy} aria-busy={busy} className="inline-flex h-12 cursor-pointer items-center gap-2 bg-navy px-6 text-sm font-semibold text-white enabled:hover:bg-blue-deep disabled:cursor-wait disabled:opacity-60">
+      <button type="submit" disabled={busy} aria-busy={busy} className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 bg-navy px-6 text-sm font-semibold text-white enabled:hover:bg-blue-deep disabled:cursor-wait disabled:opacity-60 sm:w-auto">
         <Icon name={iconName} className={`size-4 ${busy ? "animate-spin" : ""}`} />
         {buttonLabel}
       </button>
