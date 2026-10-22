@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteHeaderAuthProvider } from "@/components/site-header-auth";
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </SiteHeaderAuthProvider>
         <SiteFooter />
         <WhatsAppFloat />
+        <Analytics />
       </body>
     </html>
   );
