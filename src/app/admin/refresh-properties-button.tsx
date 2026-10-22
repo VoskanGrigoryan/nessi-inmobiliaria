@@ -16,7 +16,7 @@ export function RefreshPropertiesButton() {
       className="inline-flex cursor-pointer items-center gap-2 border border-navy/15 px-4 py-3 text-sm text-navy hover:border-gold disabled:cursor-wait disabled:opacity-60"
     >
       <Icon name="refresh" className={`size-4 ${isPending ? "animate-spin" : ""}`} />
-      {isPending ? "Actualizando…" : "Refrescar"}
+      {isPending ? "Actualizando…" : "Actualizar"}
     </button>
   );
 }

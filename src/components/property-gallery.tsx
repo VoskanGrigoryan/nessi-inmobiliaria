@@ -59,9 +59,9 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
           type="button"
           aria-label={`Ampliar foto 1 de ${title}`}
           onClick={() => showImage(0)}
-          className={`group relative block w-full cursor-zoom-in overflow-hidden bg-sand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${images.length > 1 ? "aspect-[1.45] sm:aspect-auto sm:min-h-[420px]" : "mx-auto aspect-[1.45] sm:aspect-[1.7] sm:max-w-5xl"}`}
+          className={`group relative block w-full cursor-zoom-in overflow-hidden bg-sand transition-transform duration-150 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none motion-reduce:active:scale-100 ${images.length > 1 ? "aspect-[1.45] sm:aspect-auto sm:min-h-[420px]" : "mx-auto aspect-[1.45] sm:aspect-[1.7] sm:max-w-5xl"}`}
         >
-          <Image src={images[0]} alt={title} fill priority sizes="(max-width: 640px) 100vw, 65vw" className={`${images.length > 1 ? "object-cover" : "object-contain"} transition-transform duration-500 group-hover:scale-[1.03]`} />
+          <Image src={images[0]} alt={title} fill priority sizes="(max-width: 640px) 100vw, 65vw" className={`${images.length > 1 ? "object-cover" : "object-contain"} transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100`} />
           <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
             <Icon name="expand" className="size-4" />
           </span>
@@ -75,9 +75,9 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
                 type="button"
                 aria-label={`Ampliar foto ${index + 2} de ${title}`}
                 onClick={() => showImage(index + 1)}
-                className="group relative block aspect-[1.5] w-full cursor-zoom-in overflow-hidden bg-sand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:aspect-auto sm:min-h-[204px]"
+                className="group relative block aspect-[1.5] w-full cursor-zoom-in overflow-hidden bg-sand transition-transform duration-150 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none motion-reduce:active:scale-100 sm:aspect-auto sm:min-h-[204px]"
               >
-                <Image src={image} alt={`${title}, foto ${index + 2}`} fill sizes="(max-width: 640px) 50vw, 35vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                <Image src={image} alt={`${title}, foto ${index + 2}`} fill sizes="(max-width: 640px) 50vw, 35vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
                 <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
                   <Icon name="expand" className="size-4" />
                 </span>
@@ -103,7 +103,7 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
         {activeImage && (
           <div className="relative flex h-full items-center justify-center p-5 sm:p-12">
             <div className="relative h-[78vh] w-full">
-              <Image src={activeImage} alt={`${title}, foto ${(activeIndex ?? 0) + 1}`} fill priority sizes="100vw" className="object-contain" />
+              <Image key={activeIndex} src={activeImage} alt={`${title}, foto ${(activeIndex ?? 0) + 1}`} fill priority sizes="100vw" className="gallery-image-enter object-contain" />
             </div>
 
             <button type="button" aria-label="Cerrar galería" onClick={() => dialogRef.current?.close()} className="absolute right-4 top-4 z-10 grid size-11 cursor-pointer place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">

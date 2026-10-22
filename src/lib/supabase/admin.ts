@@ -5,15 +5,19 @@ export async function isAdminUser() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return false;
 
+  const claimsStartedAt = performance.now();
   const { data } = await supabase.auth.getClaims();
+  console.info(`[perf] property.detail.adminClaims duration_ms=${Math.round(performance.now() - claimsStartedAt)}`);
   const userId = data?.claims?.sub;
   if (!userId) return false;
 
+  const adminQueryStartedAt = performance.now();
   const { data: admin } = await supabase
     .from("admin_users")
     .select("id")
     .eq("id", userId)
     .maybeSingle();
+  console.info(`[perf] property.detail.adminUsersQuery duration_ms=${Math.round(performance.now() - adminQueryStartedAt)}`);
   return Boolean(admin);
 }
 

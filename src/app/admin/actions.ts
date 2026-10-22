@@ -1,34 +1,54 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { publishedPropertiesCacheTag } from "@/lib/properties";
 import { isPropertyLocation } from "@/lib/property-locations";
 import { propertyAmenities } from "@/lib/property-amenities";
 
 export type LoginState = { error?: "setup" | "invalid" | "unauthorized" };
 
+async function timed<T>(label: string, action: () => PromiseLike<T>): Promise<T> {
+  const startedAt = performance.now();
+  try {
+    return await action();
+  } finally {
+    console.info(`[perf] ${label} duration_ms=${Math.round(performance.now() - startedAt)}`);
+  }
+}
+
 export async function login(_: LoginState, formData: FormData): Promise<LoginState> {
+  const startedAt = performance.now();
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { error: "setup" };
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: String(formData.get("email") ?? "").trim(),
-    password: String(formData.get("password") ?? ""),
-  });
-  if (error) return { error: "invalid" };
+  const { error } = await timed("admin.login.signInWithPassword", () =>
+    supabase.auth.signInWithPassword({
+      email: String(formData.get("email") ?? "").trim(),
+      password: String(formData.get("password") ?? ""),
+    }),
+  );
+  if (error) {
+    console.info(`[perf] admin.login.total duration_ms=${Math.round(performance.now() - startedAt)}`);
+    return { error: "invalid" };
+  }
 
-  const { data } = await supabase.auth.getClaims();
+  const { data } = await timed("admin.login.getClaims", () => supabase.auth.getClaims());
   const userId = data?.claims?.sub;
   const { data: admin } = typeof userId === "string"
-    ? await supabase.from("admin_users").select("id").eq("id", userId).maybeSingle()
+    ? await timed("admin.login.adminUsersQuery", () =>
+      supabase.from("admin_users").select("id").eq("id", userId).maybeSingle(),
+    )
     : { data: null };
 
   if (!admin) {
-    await supabase.auth.signOut();
+    await timed("admin.login.signOut", () => supabase.auth.signOut());
+    console.info(`[perf] admin.login.total duration_ms=${Math.round(performance.now() - startedAt)}`);
     return { error: "unauthorized" };
   }
+  console.info(`[perf] admin.login.total duration_ms=${Math.round(performance.now() - startedAt)}`);
   redirect("/admin");
 }
 
@@ -153,6 +173,7 @@ export async function saveProperty(formData: FormData) {
 
   const removed = existingImages.filter((path) => !imageOrder.includes(path));
   if (removed.length) await supabase.storage.from("property-images").remove(removed);
+  updateTag(publishedPropertiesCacheTag);
   revalidatePath("/");
   revalidatePath("/propiedades");
   revalidatePath(`/propiedades/${result.data.slug}`);
@@ -172,6 +193,7 @@ export async function deleteProperty(formData: FormData) {
 
   const images = property.images as string[];
   if (images.length) await supabase.storage.from("property-images").remove(images);
+  updateTag(publishedPropertiesCacheTag);
   revalidatePath("/");
   revalidatePath("/propiedades");
   revalidatePath(`/propiedades/${property.slug}`);

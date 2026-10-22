@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { formatPrice, type Property } from "@/lib/properties";
+import { formatPrice, type PropertyCardData } from "@/lib/properties";
 
-export function PropertyCard({ property }: { property: Property }) {
+export function PropertyCard({ property, eager = false }: { property: PropertyCardData; eager?: boolean }) {
   return (
-    <article className="group overflow-hidden rounded-sm border border-navy/10 bg-white transition-shadow hover:shadow-[0_16px_40px_rgba(1,22,51,0.12)]">
+    <article className="group overflow-hidden rounded-sm border border-navy/10 bg-white transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(1,22,51,0.12)] focus-within:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-within:translate-y-0">
       <Link href={`/propiedades/${property.slug}`} className="block">
         <div className="relative aspect-[1.55] overflow-hidden bg-sand">
           {property.image ? (
@@ -13,8 +13,9 @@ export function PropertyCard({ property }: { property: Property }) {
               src={property.image}
               alt={property.title}
               fill
+              loading={eager ? "eager" : "lazy"}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.03] group-focus-within:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-focus-within:scale-100"
             />
           ) : (
             <div className="grid h-full place-items-center text-gold"><Icon name="home" className="size-12" /></div>

@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { createClient } from "@supabase/supabase-js";
 import type { PropertyAmenity } from "@/lib/property-amenities";
 
 export type Operation = "venta" | "alquiler";
@@ -33,6 +34,23 @@ export type Property = {
   status?: "published" | "draft";
 };
 
+export type PropertyCardData = Pick<
+  Property,
+  | "slug"
+  | "title"
+  | "operation"
+  | "type"
+  | "neighborhood"
+  | "city"
+  | "price"
+  | "currency"
+  | "rooms"
+  | "bathrooms"
+  | "area"
+  | "image"
+  | "featured"
+>;
+
 type PropertyRow = {
   id: string;
   slug: string;
@@ -59,8 +77,39 @@ type PropertyRow = {
   status: Property["status"];
 };
 
+type PropertyCardRow = Pick<
+  PropertyRow,
+  | "slug"
+  | "title"
+  | "operation"
+  | "property_type"
+  | "neighborhood"
+  | "city"
+  | "price"
+  | "currency"
+  | "rooms"
+  | "bathrooms"
+  | "area"
+  | "images"
+  | "featured"
+>;
+
 const photo = (id: string) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=85`;
+
+export const publishedPropertiesCacheTag = "published-properties";
+
+function createPublishedPropertiesClient(url: string, key: string) {
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: {
+      fetch: (input, init) => fetch(input, {
+        ...init,
+        next: { revalidate: 3600, tags: [publishedPropertiesCacheTag] },
+      }),
+    },
+  });
+}
 
 export const sampleProperties: Property[] = [
   {
@@ -197,39 +246,113 @@ function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Pr
   };
 }
 
-export async function getProperties() {
-  const { createSupabaseServerClient } = await import("@/lib/supabase/server");
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
-    return process.env.NODE_ENV === "production" ? [] : sampleProperties;
+function toPropertyCardData(
+  row: PropertyCardRow,
+  getImageUrl: (path: string) => string,
+): PropertyCardData {
+  const imagePath = row.images?.[0] ?? "";
+  return {
+    slug: row.slug,
+    title: row.title,
+    operation: row.operation,
+    type: row.property_type,
+    neighborhood: row.neighborhood,
+    city: row.city,
+    price: row.price,
+    currency: row.currency,
+    rooms: row.rooms,
+    bathrooms: row.bathrooms,
+    area: row.area,
+    image: imagePath.startsWith("http") ? imagePath : imagePath ? getImageUrl(imagePath) : "",
+    featured: row.featured,
+  };
+}
+
+function escapeLikeFilter(value: string) {
+  return value.replace(/[\\%_"]/g, (character) => `\\${character}`);
+}
+
+type PropertyFilters = {
+  operation?: string;
+  type?: string;
+  minimumRooms?: number;
+  location?: string;
+};
+
+export async function getProperties(filters: PropertyFilters = {}): Promise<PropertyCardData[]> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) {
+    const properties = process.env.NODE_ENV === "production" ? [] : sampleProperties;
+    return properties.map((property) => ({
+      slug: property.slug,
+      title: property.title,
+      operation: property.operation,
+      type: property.type,
+      neighborhood: property.neighborhood,
+      city: property.city,
+      price: property.price,
+      currency: property.currency,
+      rooms: property.rooms,
+      bathrooms: property.bathrooms,
+      area: property.area,
+      image: property.image,
+      featured: property.featured,
+    })).filter((property) => {
+      const location = filters.location?.trim().toLocaleLowerCase("es-AR");
+      const propertyLocation = `${property.neighborhood} ${property.city}`.toLocaleLowerCase("es-AR");
+      return (
+        (!filters.operation || property.operation === filters.operation) &&
+        (!filters.type || property.type === filters.type) &&
+        (!location || propertyLocation.includes(location)) &&
+        property.rooms >= (filters.minimumRooms || 0)
+      );
+    });
   }
 
-  const { data } = await supabase
+  const supabase = createPublishedPropertiesClient(url, key);
+  let query = supabase
     .from("properties")
-    .select("*")
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+    .select("slug,title,operation,property_type,neighborhood,city,price,currency,rooms,bathrooms,area,images,featured")
+    .eq("status", "published");
 
-  return (data ?? []).map((row) =>
-    toProperty(row as PropertyRow, (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl),
-  );
+  if (filters.operation) query = query.eq("operation", filters.operation);
+  if (filters.type) query = query.eq("property_type", filters.type);
+  if (filters.minimumRooms && Number.isFinite(filters.minimumRooms)) {
+    query = query.gte("rooms", filters.minimumRooms);
+  }
+  const location = filters.location?.trim();
+  if (location) {
+    const pattern = `"%${escapeLikeFilter(location)}%"`;
+    query = query.or(`neighborhood.ilike.${pattern},city.ilike.${pattern}`);
+  }
+
+  const { data } = await query.order("created_at", { ascending: false });
+
+  return (data ?? []).map((row) => toPropertyCardData(
+      row as PropertyCardRow,
+      (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl,
+    ));
 }
 
 export const getPropertyBySlug = cache(async (slug: string) => {
-  const { createSupabaseServerClient } = await import("@/lib/supabase/server");
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) {
     return process.env.NODE_ENV === "production"
       ? undefined
       : sampleProperties.find((property) => property.slug === slug);
   }
 
+  const startedAt = performance.now();
+  const supabase = createPublishedPropertiesClient(url, key);
   const { data } = await supabase
     .from("properties")
     .select("*")
     .eq("slug", slug)
     .eq("status", "published")
     .maybeSingle();
+  console.info(`[perf] property.detail.query duration_ms=${Math.round(performance.now() - startedAt)}`);
 
   return data
     ? toProperty(data as PropertyRow, (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl)

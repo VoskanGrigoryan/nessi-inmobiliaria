@@ -14,6 +14,26 @@ function EditLinkIcon() {
   );
 }
 
+function ViewLinkStatus() {
+  const { pending } = useLinkStatus();
+  if (!pending) return null;
+
+  return (
+    <>
+      <Icon name="refresh" className="ml-1 inline size-3.5 animate-spin" />
+      <span className="sr-only" role="status">Abriendo propiedad...</span>
+    </>
+  );
+}
+
+export function ViewPropertyLink({ href, title }: { href: string; title: string }) {
+  return (
+    <Link href={href} title="Ver en el sitio" className="cursor-pointer decoration-gold underline-offset-4 hover:underline focus-visible:underline">
+      {title}<ViewLinkStatus />
+    </Link>
+  );
+}
+
 export function EditPropertyLink({ href, title }: { href: string; title: string }) {
   return (
     <Link
