@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
-import { getWhatsAppUrl } from "@/lib/properties";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Contacto" };
 

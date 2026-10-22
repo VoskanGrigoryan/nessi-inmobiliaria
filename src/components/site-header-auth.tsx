@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon } from "@/components/icon";
 
 const AdminStatusContext = createContext<boolean | null>(null);
 
@@ -78,11 +79,11 @@ export function useAdminStatus() {
   return useContext(AdminStatusContext);
 }
 
-export function HeaderAdminLink({ className }: { className: string }) {
+export function HeaderAdminLink({ className, onClick }: { className: string; onClick?: () => void }) {
   const isAdmin = useAdminStatus();
   if (!isAdmin) return null;
 
-  return <Link href="/admin" className={className}>Administraci&oacute;n</Link>;
+  return <Link href="/admin" onClick={onClick} className={className}>Administraci&oacute;n</Link>;
 }
 
 export function HeaderLoginLink({ icon }: { icon: ReactNode }) {
@@ -98,5 +99,39 @@ export function HeaderLoginLink({ icon }: { icon: ReactNode }) {
     >
       {icon}
     </Link>
+  );
+}
+
+export function MobileNavigation() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeMenu = () => setIsOpen(false);
+
+  return (
+    <div className="relative md:hidden">
+      <button
+        type="button"
+        aria-label={isOpen ? "Cerrar navegación" : "Abrir navegación"}
+        aria-expanded={isOpen}
+        aria-controls="mobile-site-navigation"
+        onClick={() => setIsOpen((open) => !open)}
+        className="grid size-10 place-items-center rounded-full border border-navy/15 text-navy transition-colors hover:border-gold hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+      >
+        <Icon name={isOpen ? "close" : "menu"} className="size-5" />
+      </button>
+      {isOpen && (
+        <nav
+          id="mobile-site-navigation"
+          aria-label="Navegación principal"
+          className="absolute right-0 top-12 z-50 w-64 max-w-[calc(100vw-2.5rem)] border border-navy/10 bg-white p-2 shadow-lg shadow-navy/10"
+        >
+          <HeaderAdminLink onClick={closeMenu} className="block px-3 py-3 text-sm font-semibold text-blue-deep hover:bg-paper" />
+          <Link href="/" onClick={closeMenu} className="block px-3 py-3 text-sm font-semibold text-blue-deep hover:bg-paper">Inicio</Link>
+          <Link href="/propiedades" onClick={closeMenu} className="block px-3 py-3 text-sm font-semibold text-blue-deep hover:bg-paper">Propiedades</Link>
+          <Link href="/nosotros" onClick={closeMenu} className="block px-3 py-3 text-sm font-semibold text-blue-deep hover:bg-paper">Nosotros</Link>
+          <Link href="/contacto" onClick={closeMenu} className="block px-3 py-3 text-sm font-semibold text-blue-deep hover:bg-paper">Contacto</Link>
+        </nav>
+      )}
+    </div>
   );
 }

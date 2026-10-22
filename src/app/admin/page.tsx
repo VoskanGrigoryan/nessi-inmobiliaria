@@ -30,8 +30,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Administración</p>
           <h1 className="mt-2 font-editorial text-3xl text-navy">Propiedades</h1>
         </div>
-        <div className="flex gap-3">
-          <Link href="/admin/propiedades/nueva" className="inline-flex cursor-pointer items-center gap-2 bg-navy px-4 py-3 text-sm font-semibold text-white hover:bg-blue-deep"><Icon name="plus" className="size-4" />Nueva propiedad</Link>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:gap-3">
+          <Link href="/admin/propiedades/nueva" className="col-span-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 bg-navy px-4 py-3 text-sm font-semibold text-white hover:bg-blue-deep sm:col-span-1 sm:w-auto"><Icon name="plus" className="size-4" />Nueva propiedad</Link>
           <RefreshPropertiesButton />
           <LogoutButton />
         </div>
@@ -44,7 +44,38 @@ export default async function AdminPage({ searchParams }: PageProps) {
       ) : null}
 
       {properties.length ? (
-        <div className="mt-8 overflow-x-auto border border-navy/10 bg-white">
+        <>
+        <div className="mt-8 grid gap-3 md:hidden">
+          {properties.map((property) => (
+            <article key={property.id} className="min-w-0 border border-navy/10 bg-white p-4">
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="break-words font-semibold text-navy">
+                    {property.status === "published" ? (
+                      <ViewPropertyLink href={`/propiedades/${property.slug}`} title={property.title} />
+                    ) : property.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted">{property.neighborhood}, {property.city}</p>
+                </div>
+                <CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} />
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+                <span className="capitalize text-slate">{property.operation}</span>
+                <span className="text-slate">{property.status === "published" ? "Publicado" : "Borrador"}</span>
+                <span className="font-semibold text-navy">{formatPrice(property.price, property.currency)}</span>
+                <span className="text-slate">{property.rooms} ambientes · {property.area} m²</span>
+              </div>
+              <div className="mt-4 flex items-center justify-between border-t border-navy/10 pt-3">
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted">Acciones</span>
+                <div className="flex items-center gap-2">
+                  <EditPropertyLink href={`/admin/propiedades/${property.id}/editar`} title={property.title} />
+                  <DeletePropertyForm id={property.id ?? ""} />
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="mt-8 hidden overflow-x-auto border border-navy/10 bg-white md:block">
           <table className="w-full min-w-[900px] table-fixed text-left text-sm">
             <colgroup>
               <col className="w-[42%]" /><col className="w-[7%]" /><col className="w-[12%]" />
@@ -76,6 +107,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
             </tbody>
           </table>
         </div>
+        </>
       ) : (
         <div className="mt-8 border border-navy/10 bg-white p-8 text-sm text-slate">Todavía no hay propiedades. Creá la primera para empezar.</div>
       )}

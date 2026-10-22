@@ -1,10 +1,25 @@
-import { Icon } from "@/components/icon";
-import { getWhatsAppUrl } from "@/lib/properties";
+"use client";
 
-export function WhatsAppFloat() {
+import { usePathname } from "next/navigation";
+import { Icon } from "@/components/icon";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
+
+export function WhatsAppFloat({ property }: { property?: { title: string; neighborhood: string } }) {
+  const pathname = usePathname();
+  const isPropertyPage = /^\/propiedades\/[^/]+\/?$/.test(pathname);
+  if (isPropertyPage && !property) return null;
+
+  const message = property
+    ? `Hola, me interesa la propiedad “${property.title}” en ${property.neighborhood}. ¿Podrían enviarme más información?`
+    : "Hola, quisiera consultar por una propiedad.";
+
   return (
     <a
-      href={getWhatsAppUrl("Hola, quisiera consultar por una propiedad.")}
+      href={getWhatsAppUrl(message)}
+      onClick={property ? (event) => {
+        event.preventDefault();
+        window.open(getWhatsAppUrl(`${message}\n\nEnlace: ${window.location.href}`), "_blank", "noopener,noreferrer");
+      } : undefined}
       target="_blank"
       rel="noreferrer"
       aria-label="Consultar por WhatsApp"

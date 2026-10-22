@@ -5,7 +5,9 @@ import { Icon } from "@/components/icon";
 import { ContactForm } from "@/components/contact-form";
 import { PropertyGallery } from "@/components/property-gallery";
 import { PropertyAdminEditLink } from "@/components/property-admin-edit-link";
-import { formatPrice, getPropertyBySlug, getWhatsAppUrl } from "@/lib/properties";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
+import { formatPrice, getPropertyBySlug } from "@/lib/properties";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -31,6 +33,8 @@ export default async function PropertyPage({ params }: PageProps) {
           <PropertyAdminEditLink propertyId={property.id} />
         )}
       </div>
+
+      <WhatsAppFloat property={{ title: property.title, neighborhood: property.neighborhood }} />
 
       {property.gallery.length
         ? <PropertyGallery images={property.gallery} title={property.title} />

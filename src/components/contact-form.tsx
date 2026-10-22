@@ -53,7 +53,8 @@ export function ContactForm({ title, neighborhood, whatsappUrl, initialMessage }
 
     if (submitter?.value === "whatsapp") {
       const url = new URL(whatsappUrl);
-      url.searchParams.set("text", body);
+      const whatsappBody = neighborhood ? `${body}\n\nEnlace: ${window.location.href}` : body;
+      url.searchParams.set("text", whatsappBody);
       window.open(url.toString(), "_blank", "noopener,noreferrer");
       return;
     }

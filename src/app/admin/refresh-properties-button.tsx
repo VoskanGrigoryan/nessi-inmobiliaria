@@ -13,7 +13,7 @@ export function RefreshPropertiesButton() {
       type="button"
       disabled={isPending}
       onClick={() => startTransition(() => router.refresh())}
-      className="inline-flex cursor-pointer items-center gap-2 border border-navy/15 px-4 py-3 text-sm text-navy hover:border-gold disabled:cursor-wait disabled:opacity-60"
+      className="inline-flex w-full cursor-pointer items-center justify-center gap-2 border border-navy/15 px-4 py-3 text-sm text-navy hover:border-gold disabled:cursor-wait disabled:opacity-60 sm:w-auto"
     >
       <Icon name="refresh" className={`size-4 ${isPending ? "animate-spin" : ""}`} />
       {isPending ? "Actualizando…" : "Actualizar"}

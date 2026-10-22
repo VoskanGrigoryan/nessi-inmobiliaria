@@ -3,6 +3,7 @@ import { Icon } from "@/components/icon";
 import {
   HeaderAdminLink,
   HeaderLoginLink,
+  MobileNavigation,
   SiteHeaderVisibility,
 } from "@/components/site-header-auth";
 
@@ -37,7 +38,10 @@ export function SiteHeader() {
               <Link href="/contacto" className={navLinkClassName}>Contacto</Link>
             </nav>
 
-            <HeaderLoginLink icon={<Icon name="userKey" className="size-5" />} />
+            <div className="flex shrink-0 items-center gap-2">
+              <MobileNavigation />
+              <HeaderLoginLink icon={<Icon name="userKey" className="size-5" />} />
+            </div>
           </div>
         </header>
       </>
