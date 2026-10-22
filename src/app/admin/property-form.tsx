@@ -110,6 +110,18 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
               {locations.map((location) => <option key={location}>{location}</option>)}
             </select>
           </label>
+          <label className={label}>Calle
+            <input required maxLength={150} name="street" defaultValue={property?.street ?? ""} className={input} />
+          </label>
+          <label className={label}>Número
+            <input required maxLength={30} name="street_number" defaultValue={property?.streetNumber ?? ""} className={input} />
+          </label>
+          <label className={label}>Piso (opcional)
+            <input maxLength={30} name="floor" defaultValue={property?.floor ?? ""} className={input} />
+          </label>
+          <label className={label}>Departamento (opcional)
+            <input maxLength={30} name="apartment" defaultValue={property?.apartment ?? ""} className={input} />
+          </label>
         </div>
       </section>
 

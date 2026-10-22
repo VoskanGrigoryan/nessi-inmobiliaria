@@ -20,6 +20,7 @@ export default async function PropertyPage({ params }: PageProps) {
   const property = await getPropertyBySlug(slug);
   if (!property) notFound();
 
+  const address = [property.street, property.streetNumber].filter(Boolean).join(" ");
   const whatsappUrl = getWhatsAppUrl(`Hola, me interesa la propiedad “${property.title}” en ${property.neighborhood}. ¿Podrían enviarme más información?`);
 
   return (
@@ -41,7 +42,7 @@ export default async function PropertyPage({ params }: PageProps) {
             <span className="bg-navy px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-light">
               {property.operation === "venta" ? "En venta" : "En alquiler"}
             </span>
-            <span className="text-sm text-muted">{property.type} · {property.neighborhood}, {property.city}</span>
+            <span className="text-sm text-muted">{property.type} · {address ? `${address} · ` : ""}{property.neighborhood}, {property.city}</span>
           </div>
           <h1 className="mt-4 font-editorial text-3xl leading-tight text-navy sm:text-4xl">{property.title}</h1>
           <p className="mt-4 text-2xl font-semibold text-navy">

@@ -4,6 +4,8 @@ import { Icon } from "@/components/icon";
 import { formatPrice, type PropertyCardData } from "@/lib/properties";
 
 export function PropertyCard({ property, eager = false }: { property: PropertyCardData; eager?: boolean }) {
+  const address = [property.street, property.streetNumber].filter(Boolean).join(" ");
+
   return (
     <article className="group overflow-hidden rounded-sm border border-navy/10 bg-white transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(1,22,51,0.12)] focus-within:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-within:translate-y-0">
       <Link href={`/propiedades/${property.slug}`} className="block">
@@ -27,8 +29,9 @@ export function PropertyCard({ property, eager = false }: { property: PropertyCa
         <div className="p-5">
           <p className="flex items-center gap-1.5 text-xs text-slate">
             <Icon name="pin" className="size-3.5 text-gold" />
-            {property.neighborhood}, {property.city}
+            {address || `${property.neighborhood}, ${property.city}`}
           </p>
+          {address && <p className="mt-1 text-xs text-muted">{property.neighborhood}, {property.city}</p>}
           <h3 className="mt-2 min-h-14 font-editorial text-xl leading-7 text-navy group-hover:text-blue-deep">
             {property.title}
           </h3>

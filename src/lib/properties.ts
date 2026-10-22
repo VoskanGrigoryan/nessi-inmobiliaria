@@ -14,6 +14,10 @@ export type Property = {
   type: "Departamento" | "Casa" | "PH" | "Otro";
   neighborhood: string;
   city: string;
+  street?: string;
+  streetNumber?: string;
+  floor?: string | null;
+  apartment?: string | null;
   price: number;
   expenses?: number | null;
   orientation?: Orientation | null;
@@ -42,6 +46,8 @@ export type PropertyCardData = Pick<
   | "type"
   | "neighborhood"
   | "city"
+  | "street"
+  | "streetNumber"
   | "price"
   | "currency"
   | "rooms"
@@ -59,6 +65,9 @@ type PropertyRow = {
   property_type: Property["type"];
   neighborhood: string;
   city: string;
+  street: string;
+  street_number: string;
+  property_private_addresses?: { floor: string | null; apartment: string | null } | null;
   price: number;
   expenses: number | null;
   orientation: Orientation | null;
@@ -85,6 +94,8 @@ type PropertyCardRow = Pick<
   | "property_type"
   | "neighborhood"
   | "city"
+  | "street"
+  | "street_number"
   | "price"
   | "currency"
   | "rooms"
@@ -225,6 +236,10 @@ function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Pr
     type: row.property_type,
     neighborhood: row.neighborhood,
     city: row.city,
+    street: row.street,
+    streetNumber: row.street_number,
+    floor: row.property_private_addresses?.floor ?? null,
+    apartment: row.property_private_addresses?.apartment ?? null,
     price: row.price,
     expenses: row.expenses,
     orientation: row.orientation,
@@ -258,6 +273,8 @@ function toPropertyCardData(
     type: row.property_type,
     neighborhood: row.neighborhood,
     city: row.city,
+    street: row.street,
+    streetNumber: row.street_number,
     price: row.price,
     currency: row.currency,
     rooms: row.rooms,
@@ -291,6 +308,8 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       type: property.type,
       neighborhood: property.neighborhood,
       city: property.city,
+      street: property.street,
+      streetNumber: property.streetNumber,
       price: property.price,
       currency: property.currency,
       rooms: property.rooms,
@@ -313,7 +332,7 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
   const supabase = createPublishedPropertiesClient(url, key);
   let query = supabase
     .from("properties")
-    .select("slug,title,operation,property_type,neighborhood,city,price,currency,rooms,bathrooms,area,images,featured")
+    .select("slug,title,operation,property_type,neighborhood,city,street,street_number,price,currency,rooms,bathrooms,area,images,featured")
     .eq("status", "published");
 
   if (filters.operation) query = query.eq("operation", filters.operation);
@@ -366,7 +385,7 @@ export async function getAdminProperties() {
 
   const { data } = await supabase
     .from("properties")
-    .select("*")
+    .select("*,property_private_addresses(floor,apartment)")
     .order("created_at", { ascending: false });
 
   return (data ?? []).map((row) =>

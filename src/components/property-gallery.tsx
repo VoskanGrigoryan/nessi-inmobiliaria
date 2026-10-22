@@ -6,6 +6,8 @@ import { Icon } from "@/components/icon";
 
 export function PropertyGallery({ images, title }: { images: string[]; title: string }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(() => new Set());
+  const [failedImages, setFailedImages] = useState<Set<number>>(() => new Set());
   const dialogRef = useRef<HTMLDialogElement>(null);
   const isOpen = activeIndex !== null;
   const activeImage = activeIndex === null ? null : images[activeIndex];
@@ -100,10 +102,33 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
         }}
         className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none overflow-hidden border-0 bg-transparent p-0 text-white backdrop:bg-navy/35 backdrop:backdrop-blur-md"
       >
-        {activeImage && (
+        {activeImage && activeIndex !== null && (
           <div className="relative flex h-full items-center justify-center p-5 sm:p-12">
-            <div className="relative h-[78vh] w-full">
-              <Image key={activeIndex} src={activeImage} alt={`${title}, foto ${(activeIndex ?? 0) + 1}`} fill priority sizes="100vw" className="gallery-image-enter object-contain" />
+            <div className="relative h-[78vh] w-full bg-navy/10">
+              {!loadedImages.has(activeIndex) && !failedImages.has(activeIndex) && (
+                <div role="status" className="absolute inset-0 z-10 grid place-items-center text-sm text-white">
+                  <span className="inline-flex items-center gap-2 rounded bg-navy/70 px-4 py-3">
+                    <Icon name="refresh" className="size-4 animate-spin motion-reduce:animate-none" />
+                    Cargando foto…
+                  </span>
+                </div>
+              )}
+              {failedImages.has(activeIndex) && (
+                <div role="alert" className="absolute inset-0 z-10 grid place-items-center text-sm text-white">
+                  <span className="rounded bg-navy/70 px-4 py-3">No se pudo cargar la foto.</span>
+                </div>
+              )}
+              <Image
+                key={activeIndex}
+                src={activeImage}
+                alt={`${title}, foto ${activeIndex + 1}`}
+                fill
+                priority
+                sizes="100vw"
+                onLoad={() => setLoadedImages((current) => new Set(current).add(activeIndex))}
+                onError={() => setFailedImages((current) => new Set(current).add(activeIndex))}
+                className={`gallery-image-enter object-contain transition-opacity duration-150 motion-reduce:transition-none ${loadedImages.has(activeIndex) ? "opacity-100" : "opacity-0"}`}
+              />
             </div>
 
             <button type="button" aria-label="Cerrar galería" onClick={() => dialogRef.current?.close()} className="absolute right-4 top-4 z-10 grid size-11 cursor-pointer place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">

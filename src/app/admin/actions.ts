@@ -101,8 +101,14 @@ export async function saveProperty(formData: FormData) {
   const counts = [rooms, bedrooms, bathrooms, area, coveredArea];
   const neighborhood = text(formData, "neighborhood");
   const city = text(formData, "city");
+  const street = text(formData, "street");
+  const streetNumber = text(formData, "street_number");
+  const floor = text(formData, "floor");
+  const apartment = text(formData, "apartment");
   const valid = /^[0-9a-f-]{36}$/i.test(id) && title.length > 0 && title.length <= 200 &&
     slug.length > 0 && slug.length <= 120 && isPropertyLocation(city, neighborhood) &&
+    street.length > 0 && street.length <= 150 && streetNumber.length > 0 && streetNumber.length <= 30 &&
+    floor.length <= 30 && apartment.length <= 30 &&
     numbers.every((name) => text(formData, name) !== "") &&
     values.every((value) => Number.isFinite(value) && value >= 0) && Number.isInteger(price) && counts.every(Number.isInteger) &&
     (expenses === null || (Number.isFinite(expenses) && expenses >= 0)) &&
@@ -144,6 +150,8 @@ export async function saveProperty(formData: FormData) {
     property_type: propertyType,
     neighborhood,
     city,
+    street,
+    street_number: streetNumber,
     price,
     expenses,
     orientation: orientation || null,
@@ -170,6 +178,13 @@ export async function saveProperty(formData: FormData) {
     await cleanupUploads();
     redirect(`/admin/propiedades/${page}?error=save`);
   }
+
+  const { error: addressError } = await supabase.from("property_private_addresses").upsert({
+    property_id: id,
+    floor: floor || null,
+    apartment: apartment || null,
+  });
+  if (addressError) redirect(`/admin/propiedades/${page}?error=save`);
 
   const removed = existingImages.filter((path) => !imageOrder.includes(path));
   if (removed.length) await supabase.storage.from("property-images").remove(removed);

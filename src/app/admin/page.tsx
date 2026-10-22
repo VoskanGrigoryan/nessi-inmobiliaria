@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DeletePropertyForm } from "@/app/admin/delete-property-form";
 import { LogoutButton } from "@/app/admin/logout-button";
-import { requireAdmin } from "@/lib/supabase/admin";
+import { requireAdminContext } from "@/lib/supabase/admin";
 import { getAdminProperties, formatPrice } from "@/lib/properties";
 import { Icon } from "@/components/icon";
 import { RefreshPropertiesButton } from "@/app/admin/refresh-properties-button";
@@ -14,7 +14,7 @@ type PageProps = { searchParams: Promise<{ notice?: string; error?: string }> };
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage({ searchParams }: PageProps) {
-  await requireAdmin();
+  const { email } = await requireAdminContext();
   const [properties, params] = await Promise.all([getAdminProperties(), searchParams]);
   const noticeMessage = params.notice === "saved"
     ? "La propiedad se guardó correctamente."
@@ -26,6 +26,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
     <main className="mx-auto min-h-[70vh] w-full px-5 py-10 sm:px-8 sm:py-14">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
+          {email && <p className="mb-2 break-all text-sm font-semibold text-navy">{email}</p>}
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Administración</p>
           <h1 className="mt-2 font-editorial text-3xl text-navy">Propiedades</h1>
         </div>

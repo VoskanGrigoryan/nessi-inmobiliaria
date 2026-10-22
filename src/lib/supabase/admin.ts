@@ -21,12 +21,13 @@ export async function isAdminUser() {
   return Boolean(admin);
 }
 
-export async function requireAdmin() {
+export async function requireAdminContext() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) redirect("/admin/login?setup=1");
 
   const { data } = await supabase.auth.getClaims();
-  const userId = data?.claims?.sub;
+  const claims = data?.claims;
+  const userId = claims?.sub;
   if (!userId) redirect("/admin/login");
 
   const { data: admin } = await supabase
@@ -36,5 +37,13 @@ export async function requireAdmin() {
     .maybeSingle();
   if (!admin) redirect("/admin/login?error=unauthorized");
 
+  return {
+    supabase,
+    email: typeof claims?.email === "string" ? claims.email : null,
+  };
+}
+
+export async function requireAdmin() {
+  const { supabase } = await requireAdminContext();
   return supabase;
 }
