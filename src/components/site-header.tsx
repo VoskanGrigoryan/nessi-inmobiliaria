@@ -1,9 +1,51 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/icon";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const navLinkClassName = "relative py-2 text-base font-semibold tracking-wide text-blue-deep transition-colors hover:text-gold after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-300 hover:after:scale-x-100 focus-visible:text-gold focus-visible:after:scale-x-100";
 
 export function SiteHeader() {
+  const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function checkAdmin() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+        if (active) setIsAdmin(false);
+        return;
+      }
+
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          if (active) setIsAdmin(false);
+          return;
+        }
+
+        const { data: admin, error } = await supabase
+          .from("admin_users")
+          .select("id")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        if (active) setIsAdmin(!error && Boolean(admin));
+      } catch {
+        if (active) setIsAdmin(false);
+      }
+    }
+
+    void checkAdmin();
+    return () => { active = false; };
+  }, [pathname]);
+
+  if (pathname === "/admin/login") return null;
+
   return (
     <>
       <div className="bg-navy px-5 py-2 text-center text-[10px] tracking-[0.18em] text-gold-light sm:text-xs">
@@ -24,19 +66,22 @@ export function SiteHeader() {
           </Link>
 
           <nav aria-label="Navegación principal" className="hidden items-center gap-9 md:flex">
+            {isAdmin && <Link href="/admin" className={navLinkClassName}>Administración</Link>}
             <Link href="/" className={navLinkClassName}>Inicio</Link>
             <Link href="/propiedades" className={navLinkClassName}>Propiedades</Link>
             <Link href="/nosotros" className={navLinkClassName}>Nosotros</Link>
             <Link href="/contacto" className={navLinkClassName}>Contacto</Link>
           </nav>
 
-          <Link
-            href="/admin/login"
-            aria-label="Admin login"
-            className="grid size-10 shrink-0 place-items-center rounded-full border border-navy/15 text-navy transition-colors hover:border-gold hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-          >
-            <Icon name="login" className="size-5" />
-          </Link>
+          {isAdmin === false && !pathname.startsWith("/admin") && (
+            <Link
+              href="/admin/login"
+              aria-label="Admin login"
+              className="grid size-10 shrink-0 place-items-center rounded-full border border-navy/15 text-navy transition-colors hover:border-gold hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            >
+              <Icon name="userKey" className="size-5" />
+            </Link>
+          )}
         </div>
       </header>
     </>

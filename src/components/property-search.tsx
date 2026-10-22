@@ -40,6 +40,7 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
           <option>Departamento</option>
           <option>Casa</option>
           <option>PH</option>
+          <option>Otro</option>
         </select>
       </label>
       <label className="block text-xs font-medium text-slate">

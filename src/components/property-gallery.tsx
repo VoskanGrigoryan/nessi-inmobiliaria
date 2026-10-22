@@ -59,9 +59,9 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
           type="button"
           aria-label={`Ampliar foto 1 de ${title}`}
           onClick={() => showImage(0)}
-          className={`group relative block w-full cursor-zoom-in overflow-hidden bg-sand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${images.length > 1 ? "aspect-[1.45] sm:aspect-auto sm:min-h-[420px]" : "aspect-[1.45] sm:aspect-[1.7]"}`}
+          className={`group relative block w-full cursor-zoom-in overflow-hidden bg-sand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${images.length > 1 ? "aspect-[1.45] sm:aspect-auto sm:min-h-[420px]" : "mx-auto aspect-[1.45] sm:aspect-[1.7] sm:max-w-5xl"}`}
         >
-          <Image src={images[0]} alt={title} fill priority sizes="(max-width: 640px) 100vw, 65vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+          <Image src={images[0]} alt={title} fill priority sizes="(max-width: 640px) 100vw, 65vw" className={`${images.length > 1 ? "object-cover" : "object-contain"} transition-transform duration-500 group-hover:scale-[1.03]`} />
           <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
             <Icon name="expand" className="size-4" />
           </span>

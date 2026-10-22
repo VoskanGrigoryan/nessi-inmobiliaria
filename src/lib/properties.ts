@@ -1,4 +1,5 @@
 import { cache } from "react";
+import type { PropertyAmenity } from "@/lib/property-amenities";
 
 export type Operation = "venta" | "alquiler";
 export type Orientation = "Norte" | "Noreste" | "Este" | "Sudeste" | "Sur" | "Sudoeste" | "Oeste" | "Noroeste";
@@ -9,7 +10,7 @@ export type Property = {
   slug: string;
   title: string;
   operation: Operation;
-  type: "Departamento" | "Casa" | "PH";
+  type: "Departamento" | "Casa" | "PH" | "Otro";
   neighborhood: string;
   city: string;
   price: number;
@@ -22,6 +23,8 @@ export type Property = {
   bathrooms: number;
   area: number;
   coveredArea: number;
+  hasGarage?: boolean;
+  amenities: PropertyAmenity[];
   description: string;
   image: string;
   gallery: string[];
@@ -48,6 +51,8 @@ type PropertyRow = {
   bathrooms: number;
   area: number;
   covered_area: number;
+  has_garage: boolean;
+  amenities: PropertyAmenity[];
   description: string;
   images: string[];
   featured: boolean;
@@ -74,6 +79,7 @@ export const sampleProperties: Property[] = [
     bathrooms: 2,
     area: 84,
     coveredArea: 76,
+    amenities: ["Balcón", "Parrilla", "Lavadero"],
     description:
       "Un espacio amplio y luminoso, con ambientes cómodos y un balcón ideal para disfrutar la ciudad.",
     image: photo("photo-1663756915301-2ba688e078cf"),
@@ -98,6 +104,7 @@ export const sampleProperties: Property[] = [
     bathrooms: 1,
     area: 48,
     coveredArea: 44,
+    amenities: ["Aire acondicionado", "Lavadero"],
     description:
       "Un departamento práctico, con cocina integrada y una distribución que aprovecha cada ambiente.",
     image: photo("photo-1753911372224-2b56c07cc737"),
@@ -121,6 +128,7 @@ export const sampleProperties: Property[] = [
     bathrooms: 2,
     area: 185,
     coveredArea: 148,
+    amenities: ["Jardín", "Parrilla", "Pileta"],
     description:
       "Una casa para disfrutar en familia, con ambientes generosos y conexión con el exterior.",
     image: photo("photo-1774979517612-db480ae5b587"),
@@ -145,6 +153,7 @@ export const sampleProperties: Property[] = [
     bathrooms: 1,
     area: 72,
     coveredArea: 66,
+    amenities: ["Terraza", "Lavadero"],
     description:
       "Un PH cálido que combina detalles de época con una puesta en valor actual y luminosa.",
     image: photo("photo-1771287491132-4954b32210d6"),
@@ -177,6 +186,8 @@ function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Pr
     bathrooms: row.bathrooms,
     area: row.area,
     coveredArea: row.covered_area,
+    hasGarage: row.has_garage ?? false,
+    amenities: row.amenities ?? [],
     description: row.description,
     gallery,
     imagePaths: row.images ?? [],

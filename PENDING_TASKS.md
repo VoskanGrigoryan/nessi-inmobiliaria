@@ -7,3 +7,9 @@
 - **Admin data needed:** An optional street address or coordinates. Decide whether the public page should show the exact address or an approximate location.
 - **Blocker:** Google Maps Embed requires a Google Cloud billing account and API key, even though Embed API usage is listed as free. Google Places previously placed a temporary 50.00 authorization charge on the owner's debit card to verify the payment method. Do not set up Google billing or add a card for this task until the owner is comfortable with the verification charge.
 - **Follow-up:** Revisit Google Maps setup, or choose a map option that does not require Google billing.
+
+## Performance review
+
+- **Status:** Pending
+- **Report:** The owner reports that many observed requests take longer than the 500 ms response-time target.
+- **Follow-up:** Measure the slow requests, identify whether time is spent in Supabase queries, image delivery, or server rendering, then prioritize the largest delays.

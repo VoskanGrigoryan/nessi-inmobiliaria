@@ -15,7 +15,7 @@ Sin variables de Supabase, el sitio muestra avisos de muestra en desarrollo y el
 
 1. Creá un proyecto en Supabase y copiá `.env.example` como `.env.local`.
 2. Completá la URL del proyecto y su publishable key.
-3. Ejecutá en orden `supabase/migrations/20261020000000_properties.sql`, `supabase/migrations/20261021000000_property_expenses.sql` y `supabase/migrations/20261021000100_property_orientation_disposition.sql` desde el SQL Editor.
+3. Ejecutá en orden `supabase/migrations/20261020000000_properties.sql`, `supabase/migrations/20261021000000_property_expenses.sql` y `supabase/migrations/20261021000100_property_orientation_disposition.sql`, `supabase/migrations/20261021000200_property_type_garage.sql` y `supabase/migrations/20261021000300_property_amenities.sql` desde el SQL Editor.
 4. Invitá a cada administrador desde **Authentication → Users**.
 5. Agregá el UUID del usuario invitado a `public.admin_users`:
 

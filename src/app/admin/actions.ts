@@ -4,16 +4,20 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isPropertyLocation } from "@/lib/property-locations";
+import { propertyAmenities } from "@/lib/property-amenities";
 
-export async function login(formData: FormData) {
+export type LoginState = { error?: "setup" | "invalid" | "unauthorized" };
+
+export async function login(_: LoginState, formData: FormData): Promise<LoginState> {
   const supabase = await createSupabaseServerClient();
-  if (!supabase) redirect("/admin/login?setup=1");
+  if (!supabase) return { error: "setup" };
 
   const { error } = await supabase.auth.signInWithPassword({
     email: String(formData.get("email") ?? "").trim(),
     password: String(formData.get("password") ?? ""),
   });
-  if (error) redirect("/admin/login?error=invalid");
+  if (error) return { error: "invalid" };
 
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
@@ -23,7 +27,7 @@ export async function login(formData: FormData) {
 
   if (!admin) {
     await supabase.auth.signOut();
-    redirect("/admin/login?error=unauthorized");
+    return { error: "unauthorized" };
   }
   redirect("/admin");
 }
@@ -49,6 +53,7 @@ export async function saveProperty(formData: FormData) {
   const isNew = formData.get("is_new") === "true";
   const page = isNew ? "nueva" : `${id}/editar`;
   const uploadedPaths = formData.getAll("uploaded_images").map(String);
+  const imageOrder = formData.getAll("image_order").map(String);
   const safeUploads = uploadedPaths.filter((path) =>
     path.startsWith(`${id}/`) && /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/i.test(path),
   );
@@ -60,6 +65,8 @@ export async function saveProperty(formData: FormData) {
   const slug = slugify(text(formData, "slug") || title);
   const operation = text(formData, "operation");
   const propertyType = text(formData, "property_type");
+  const hasGarage = text(formData, "has_garage");
+  const amenities = formData.getAll("amenities").map(String);
   const status = text(formData, "status");
   const currency = text(formData, "currency");
   const expensesText = text(formData, "expenses");
@@ -72,15 +79,21 @@ export async function saveProperty(formData: FormData) {
   const values = numbers.map((name) => Number(text(formData, name)));
   const [price, rooms, bedrooms, bathrooms, area, coveredArea] = values;
   const counts = [rooms, bedrooms, bathrooms, area, coveredArea];
+  const neighborhood = text(formData, "neighborhood");
+  const city = text(formData, "city");
   const valid = /^[0-9a-f-]{36}$/i.test(id) && title.length > 0 && title.length <= 200 &&
-    slug.length > 0 && slug.length <= 120 && text(formData, "neighborhood").length > 0 &&
-    text(formData, "city").length > 0 && numbers.every((name) => text(formData, name) !== "") &&
-    values.every((value) => Number.isFinite(value) && value >= 0) && counts.every(Number.isInteger) &&
+    slug.length > 0 && slug.length <= 120 && isPropertyLocation(city, neighborhood) &&
+    numbers.every((name) => text(formData, name) !== "") &&
+    values.every((value) => Number.isFinite(value) && value >= 0) && Number.isInteger(price) && counts.every(Number.isInteger) &&
     (expenses === null || (Number.isFinite(expenses) && expenses >= 0)) &&
     orientations.includes(orientation) && dispositions.includes(disposition) &&
-    ["venta", "alquiler"].includes(operation) && ["Departamento", "Casa", "PH"].includes(propertyType) &&
+    ["venta", "alquiler"].includes(operation) && ["Departamento", "Casa", "PH", "Otro"].includes(propertyType) &&
+    ["true", "false"].includes(hasGarage) &&
+    new Set(amenities).size === amenities.length && amenities.every((amenity) => propertyAmenities.includes(amenity as (typeof propertyAmenities)[number])) &&
     ["USD", "ARS"].includes(currency) && ["draft", "published"].includes(status) &&
-    text(formData, "description").length <= 10000 && safeUploads.length === uploadedPaths.length;
+    text(formData, "description").length <= 10000 && safeUploads.length === uploadedPaths.length &&
+    new Set(uploadedPaths).size === uploadedPaths.length && new Set(imageOrder).size === imageOrder.length &&
+    safeUploads.every((path) => imageOrder.includes(path));
 
   if (!valid) {
     await cleanupUploads();
@@ -95,9 +108,11 @@ export async function saveProperty(formData: FormData) {
   }
 
   const existingImages = (oldProperty?.images as string[] | undefined) ?? [];
-  const removeImages = new Set(formData.getAll("remove_images").map(String));
-  const keptImages = existingImages.filter((path) => !removeImages.has(path));
-  if (keptImages.length + uploadedPaths.length > 20) {
+  if (imageOrder.some((path) => !safeUploads.includes(path) && !existingImages.includes(path))) {
+    await cleanupUploads();
+    redirect(`/admin/propiedades/${page}?error=invalid`);
+  }
+  if (imageOrder.length > 20) {
     await cleanupUploads();
     redirect(`/admin/propiedades/${page}?error=images`);
   }
@@ -107,8 +122,8 @@ export async function saveProperty(formData: FormData) {
     title,
     operation,
     property_type: propertyType,
-    neighborhood: text(formData, "neighborhood"),
-    city: text(formData, "city"),
+    neighborhood,
+    city,
     price,
     expenses,
     orientation: orientation || null,
@@ -119,8 +134,10 @@ export async function saveProperty(formData: FormData) {
     bathrooms,
     area,
     covered_area: coveredArea,
+    has_garage: hasGarage === "true",
+    amenities,
     description: text(formData, "description"),
-    images: [...keptImages, ...uploadedPaths],
+    images: imageOrder,
     featured: formData.get("featured") === "on",
     status,
     updated_at: new Date().toISOString(),
@@ -134,7 +151,7 @@ export async function saveProperty(formData: FormData) {
     redirect(`/admin/propiedades/${page}?error=save`);
   }
 
-  const removed = existingImages.filter((path) => removeImages.has(path));
+  const removed = existingImages.filter((path) => !imageOrder.includes(path));
   if (removed.length) await supabase.storage.from("property-images").remove(removed);
   revalidatePath("/");
   revalidatePath("/propiedades");

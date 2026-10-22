@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-paper text-navy antialiased">
+      <body className="flex min-h-screen flex-col bg-paper text-navy antialiased">
         <SiteHeader />
-        {children}
+        <div className="flex flex-1 flex-col">{children}</div>
         <SiteFooter />
         <WhatsAppFloat />
       </body>
