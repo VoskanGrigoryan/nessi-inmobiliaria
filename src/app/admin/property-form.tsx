@@ -10,7 +10,18 @@ import { isPropertyCity, isPropertyLocation, propertyLocations, type PropertyCit
 import { propertyAmenities } from "@/lib/property-amenities";
 
 function formatThousands(value: string) {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const [integer, decimal] = value.split(".");
+  const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return decimal === undefined ? formattedInteger : `${formattedInteger},${decimal}`;
+}
+
+function parseFormattedAmount(value: string) {
+  const [integer, ...decimalParts] = value.replace(/[^\d,.]/g, "").split(",");
+  const normalizedInteger = integer.replace(/\D/g, "");
+  if (!decimalParts.length) return normalizedInteger;
+
+  const decimal = decimalParts.join("").replace(/\D/g, "");
+  return `${normalizedInteger || "0"}.${decimal}`;
 }
 
 function PropertyFormActions({ uploading, property }: { uploading: boolean; property?: Property }) {
@@ -54,6 +65,7 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
     isPropertyLocation(initialCity, property?.neighborhood ?? "") ? property?.neighborhood ?? "" : "",
   );
   const [price, setPrice] = useState(property ? String(Math.round(property.price)) : "");
+  const [expenses, setExpenses] = useState(property?.expenses == null ? "" : String(property.expenses));
   const [uploading, setUploading] = useState(false);
   const input = "mt-1 h-11 w-full border border-navy/15 bg-white px-3 text-sm text-navy outline-none focus:border-gold";
   const label = "block text-xs font-medium text-slate";
@@ -141,7 +153,8 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
             </select>
           </label>
           <label className={label}>Expensas (ARS / mes, opcional)
-            <input type="number" min="0" step="any" name="expenses" defaultValue={property?.expenses ?? ""} className={input} />
+            <input type="hidden" name="expenses" value={expenses} />
+            <input type="text" inputMode="decimal" value={formatThousands(expenses)} onChange={(event) => setExpenses(parseFormattedAmount(event.target.value))} placeholder="Ej.: 140.000" className={input} />
           </label>
         </div>
       </section>

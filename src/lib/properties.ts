@@ -49,6 +49,7 @@ export type PropertyCardData = Pick<
   | "street"
   | "streetNumber"
   | "price"
+  | "expenses"
   | "currency"
   | "rooms"
   | "bathrooms"
@@ -97,6 +98,7 @@ type PropertyCardRow = Pick<
   | "street"
   | "street_number"
   | "price"
+  | "expenses"
   | "currency"
   | "rooms"
   | "bathrooms"
@@ -276,6 +278,7 @@ function toPropertyCardData(
     street: row.street,
     streetNumber: row.street_number,
     price: row.price,
+    expenses: row.expenses,
     currency: row.currency,
     rooms: row.rooms,
     bathrooms: row.bathrooms,
@@ -311,6 +314,7 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       street: property.street,
       streetNumber: property.streetNumber,
       price: property.price,
+      expenses: property.expenses,
       currency: property.currency,
       rooms: property.rooms,
       bathrooms: property.bathrooms,
@@ -332,7 +336,7 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
   const supabase = createPublishedPropertiesClient(url, key);
   let query = supabase
     .from("properties")
-    .select("slug,title,operation,property_type,neighborhood,city,street,street_number,price,currency,rooms,bathrooms,area,images,featured")
+    .select("slug,title,operation,property_type,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured")
     .eq("status", "published");
 
   if (filters.operation) query = query.eq("operation", filters.operation);

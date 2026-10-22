@@ -39,6 +39,9 @@ export function PropertyCard({ property, eager = false }: { property: PropertyCa
             {formatPrice(property.price, property.currency)}
             {property.operation === "alquiler" && <span className="ml-1 text-xs font-normal text-slate">/ mes</span>}
           </p>
+          {property.expenses != null && (
+            <p className="mt-1 text-xs text-muted">Expensas: {formatPrice(property.expenses, "ARS")} / mes</p>
+          )}
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-navy/10 pt-4 text-xs text-slate">
             <span className="inline-flex items-center gap-1.5"><Icon name="bed" className="size-4 text-gold" />{property.rooms} amb.</span>
             <span className="inline-flex items-center gap-1.5"><Icon name="bath" className="size-4 text-gold" />{property.bathrooms} baños</span>
