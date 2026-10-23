@@ -77,22 +77,24 @@ export default function AboutPage() {
           <div className="relative min-h-[24rem]">
             <Image src="/contact-reference-left.jpg" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
             <div aria-hidden="true" className="absolute inset-0 bg-navy/35" />
-            <div className="relative flex min-h-[24rem] flex-col justify-between p-7 sm:p-10 lg:p-12">
-              <div>
-                <h2 id="thanks-heading" className="font-editorial text-4xl leading-tight text-white sm:text-5xl">Muchas gracias</h2>
-                <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-gold-light">Contacto</p>
-                <div className="mt-4 space-y-2 text-sm sm:text-base">
-                  <a className="block w-fit hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="tel:+5491134823030">+54 9 11 3482 3030</a>
-                  <a className="block w-fit break-all hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="mailto:rosanacnessi@gmail.com">rosanacnessi@gmail.com</a>
+            <div className="relative flex min-h-[24rem] flex-col justify-center p-7 sm:p-10 lg:p-12">
+              <h2 id="thanks-heading" className="font-editorial text-4xl leading-tight text-white sm:text-5xl">Muchas gracias</h2>
+              <div className="mt-8 grid gap-6 border-t border-white/15 pt-6 lg:grid-cols-[minmax(0,1fr)_8rem] lg:items-center">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-light">Contacto</p>
+                  <div className="mt-4 space-y-2 text-sm sm:text-base">
+                    <a className="block w-fit hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="tel:+5491134823030">+54 9 11 3482 3030</a>
+                    <a className="block w-fit break-all hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="mailto:rosanacnessi@gmail.com">rosanacnessi@gmail.com</a>
+                  </div>
                 </div>
+                <Image
+                  src="/rosana-nessi-logo.png"
+                  alt="Rosana Nessi Negocios Inmobiliarios"
+                  width={433}
+                  height={408}
+                  className="h-28 w-28 justify-self-end object-contain lg:h-32 lg:w-32"
+                />
               </div>
-              <Image
-                src="/rosana-nessi-logo.png"
-                alt="Rosana Nessi Negocios Inmobiliarios"
-                width={433}
-                height={408}
-                className="mt-8 h-28 w-28 self-end object-contain sm:h-32 sm:w-32"
-              />
             </div>
           </div>
 
