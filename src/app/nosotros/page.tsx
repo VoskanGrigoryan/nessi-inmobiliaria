@@ -79,7 +79,7 @@ export default function AboutPage() {
             <div aria-hidden="true" className="absolute inset-0 bg-navy/35" />
             <div className="relative flex min-h-[24rem] flex-col justify-center p-7 sm:p-10 lg:p-12">
               <h2 id="thanks-heading" className="font-editorial text-4xl leading-tight text-white sm:text-5xl">Muchas gracias</h2>
-              <div className="mt-8 grid gap-6 border-t border-white/15 pt-6 lg:grid-cols-[minmax(0,1fr)_8rem] lg:items-center">
+              <div className="mt-8 grid gap-6 border-t border-white/15 pt-6 lg:grid-cols-[minmax(0,1fr)_12rem] lg:items-center">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-light">Contacto</p>
                   <div className="mt-4 space-y-2 text-sm sm:text-base">
@@ -92,7 +92,7 @@ export default function AboutPage() {
                   alt="Rosana Nessi Negocios Inmobiliarios"
                   width={433}
                   height={408}
-                  className="h-28 w-28 justify-self-end object-contain lg:h-32 lg:w-32"
+                  className="h-40 w-40 justify-self-center object-contain lg:h-48 lg:w-48 lg:justify-self-end"
                 />
               </div>
             </div>
