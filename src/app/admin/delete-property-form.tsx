@@ -4,28 +4,30 @@ import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { deleteProperty } from "@/app/admin/actions";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 function ConfirmationActions({ onCancel }: { onCancel: () => void }) {
   const { pending } = useFormStatus();
 
   return (
     <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-      <button
+      <Button
         type="button"
         onClick={onCancel}
         disabled={pending}
-        className="w-full cursor-pointer border border-navy/20 px-4 py-2.5 text-sm font-medium text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+        className="w-full disabled:cursor-wait disabled:opacity-60 sm:w-auto"
       >
         Cancelar
-      </button>
-      <button
+      </Button>
+      <Button
         type="submit"
+        variant="danger"
         disabled={pending}
-        className="inline-flex w-full cursor-pointer items-center justify-center gap-2 bg-red-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-800 disabled:cursor-wait disabled:opacity-70 sm:w-auto"
+        className="w-full disabled:cursor-wait disabled:opacity-70 sm:w-auto"
       >
         <Icon name={pending ? "refresh" : "trash"} className={`size-4 ${pending ? "animate-spin" : ""}`} />
         {pending ? "Eliminando..." : "Eliminar propiedad"}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -53,19 +55,20 @@ export function DeletePropertyForm({ id, label }: { id: string; label?: string }
   return (
     <form action={deleteProperty}>
       <input type="hidden" name="id" value={id} />
-      <button
+      <Button
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(true)}
         aria-label="Eliminar propiedad"
         title="Eliminar"
+        variant="custom"
         className={label
           ? "inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 border border-red-200 px-4 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 sm:w-auto"
           : "inline-flex size-9 cursor-pointer items-center justify-center rounded border border-red-200 text-red-700 transition-colors hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"}
       >
         <Icon name="trash" className="size-4" />
         {label && <span>{label}</span>}
-      </button>
+      </Button>
       <dialog
         ref={dialogRef}
         role="alertdialog"

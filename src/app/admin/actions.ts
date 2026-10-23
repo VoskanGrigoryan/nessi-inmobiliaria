@@ -6,7 +6,8 @@ import { requireAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { publishedPropertiesCacheTag } from "@/lib/properties";
 import { isPropertyLocation } from "@/lib/property-locations";
-import { propertyAmenities } from "@/lib/property-amenities";
+import { propertyFeatures } from "@/lib/property-features";
+import { isYoutubeUrl } from "@/lib/youtube";
 
 export type LoginState = { error?: "setup" | "invalid" | "unauthorized" };
 
@@ -85,20 +86,24 @@ export async function saveProperty(formData: FormData) {
   const slug = slugify(text(formData, "slug") || title);
   const operation = text(formData, "operation");
   const propertyType = text(formData, "property_type");
-  const hasGarage = text(formData, "has_garage");
-  const amenities = formData.getAll("amenities").map(String);
+  const characteristics = formData.getAll("characteristics").map(String);
   const status = text(formData, "status");
   const currency = text(formData, "currency");
   const expensesText = text(formData, "expenses");
   const expenses = expensesText ? Number(expensesText) : null;
   const orientation = text(formData, "orientation");
   const disposition = text(formData, "disposition");
+  const buildingAge = text(formData, "building_age");
+  const garageCount = Number(text(formData, "garage_count"));
+  const videoUrl = text(formData, "video_url");
   const orientations = ["", "Norte", "Noreste", "Este", "Sudeste", "Sur", "Sudoeste", "Oeste", "Noroeste"];
-  const dispositions = ["", "Frente", "Contrafrente"];
-  const numbers = ["price", "rooms", "bedrooms", "bathrooms", "area", "covered_area"];
+  const dispositions = ["", "Frente", "Contrafrente", "Lateral", "Interno"];
+  const buildingAges = ["", "En pozo", "A estrenar", "1 a 10", "10 a 20", "20+"];
+  const booleanOptions = ["true", "false"];
+  const numbers = ["price", "rooms", "bedrooms", "bathrooms", "area", "covered_area", "uncovered_area", "semi_covered_area"];
   const values = numbers.map((name) => Number(text(formData, name)));
-  const [price, rooms, bedrooms, bathrooms, area, coveredArea] = values;
-  const counts = [rooms, bedrooms, bathrooms, area, coveredArea];
+  const [price, rooms, bedrooms, bathrooms, area, coveredArea, uncoveredArea, semiCoveredArea] = values;
+  const counts = values.slice(1);
   const neighborhood = text(formData, "neighborhood");
   const city = text(formData, "city");
   const street = text(formData, "street");
@@ -113,9 +118,11 @@ export async function saveProperty(formData: FormData) {
     values.every((value) => Number.isFinite(value) && value >= 0) && Number.isInteger(price) && counts.every(Number.isInteger) &&
     (expenses === null || (Number.isFinite(expenses) && expenses >= 0)) &&
     orientations.includes(orientation) && dispositions.includes(disposition) &&
-    ["venta", "alquiler"].includes(operation) && ["Departamento", "Casa", "PH", "Otro"].includes(propertyType) &&
-    ["true", "false"].includes(hasGarage) &&
-    new Set(amenities).size === amenities.length && amenities.every((amenity) => propertyAmenities.includes(amenity as (typeof propertyAmenities)[number])) &&
+    ["venta", "alquiler"].includes(operation) && ["Departamento", "Casa", "PH", "Otro", "Lote", "Depósito", "Local comercial", "Cochera", "Oficina"].includes(propertyType) &&
+    text(formData, "garage_count") !== "" && Number.isInteger(garageCount) && garageCount >= 0 &&
+    booleanOptions.includes(text(formData, "accessible_ramp")) && booleanOptions.includes(text(formData, "apto_credito")) &&
+    buildingAges.includes(buildingAge) && videoUrl.length <= 500 && isYoutubeUrl(videoUrl) &&
+    new Set(characteristics).size === characteristics.length && characteristics.every((characteristic) => propertyFeatures.includes(characteristic as (typeof propertyFeatures)[number])) &&
     ["USD", "ARS"].includes(currency) && ["draft", "published"].includes(status) &&
     text(formData, "description").length <= 10000 && safeUploads.length === uploadedPaths.length &&
     new Set(uploadedPaths).size === uploadedPaths.length && new Set(imageOrder).size === imageOrder.length &&
@@ -162,8 +169,14 @@ export async function saveProperty(formData: FormData) {
     bathrooms,
     area,
     covered_area: coveredArea,
-    has_garage: hasGarage === "true",
-    amenities,
+    uncovered_area: uncoveredArea,
+    semi_covered_area: semiCoveredArea,
+    garage_count: garageCount,
+    accessible_ramp: text(formData, "accessible_ramp") === "true",
+    building_age: buildingAge || null,
+    apto_credito: text(formData, "apto_credito") === "true",
+    characteristics,
+    video_url: videoUrl || null,
     description: text(formData, "description"),
     images: imageOrder,
     featured: formData.get("featured") === "on",

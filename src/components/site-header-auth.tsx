@@ -4,12 +4,15 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 const AdminStatusContext = createContext<boolean | null>(null);
+const AuthenticatedUserContext = createContext<string | null>(null);
 
 export function SiteHeaderAuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [authenticatedUserId, setAuthenticatedUserId] = useState<string | null>(null);
   const checkedAdminUserId = useRef<string | null>(null);
   const checkedAdminStatus = useRef(false);
 
@@ -23,6 +26,7 @@ export function SiteHeaderAuthProvider({ children }: { children: ReactNode }) {
         if (active) {
           checkedAdminUserId.current = null;
           checkedAdminStatus.current = false;
+          setAuthenticatedUserId(null);
           setIsAdmin(false);
         }
         return;
@@ -36,10 +40,13 @@ export function SiteHeaderAuthProvider({ children }: { children: ReactNode }) {
           if (active) {
             checkedAdminUserId.current = null;
             checkedAdminStatus.current = false;
+            setAuthenticatedUserId(null);
             setIsAdmin(false);
           }
           return;
         }
+
+        if (active) setAuthenticatedUserId(session.user.id);
 
         if (checkedAdminUserId.current === session.user.id) {
           if (active) setIsAdmin(checkedAdminStatus.current);
@@ -58,7 +65,10 @@ export function SiteHeaderAuthProvider({ children }: { children: ReactNode }) {
           setIsAdmin(isAdminUser);
         }
       } catch {
-        if (active) setIsAdmin(false);
+        if (active) {
+          setAuthenticatedUserId(null);
+          setIsAdmin(false);
+        }
       }
     }
 
@@ -66,7 +76,11 @@ export function SiteHeaderAuthProvider({ children }: { children: ReactNode }) {
     return () => { active = false; };
   }, [pathname]);
 
-  return <AdminStatusContext.Provider value={isAdmin}>{children}</AdminStatusContext.Provider>;
+  return (
+    <AuthenticatedUserContext.Provider value={authenticatedUserId}>
+      <AdminStatusContext.Provider value={isAdmin}>{children}</AdminStatusContext.Provider>
+    </AuthenticatedUserContext.Provider>
+  );
 }
 
 export function SiteHeaderVisibility({ children }: { children: ReactNode }) {
@@ -77,6 +91,10 @@ export function SiteHeaderVisibility({ children }: { children: ReactNode }) {
 
 export function useAdminStatus() {
   return useContext(AdminStatusContext);
+}
+
+export function useAuthenticatedUserId() {
+  return useContext(AuthenticatedUserContext);
 }
 
 export function HeaderAdminLink({ className, onClick }: { className: string; onClick?: () => void }) {
@@ -95,7 +113,7 @@ export function HeaderLoginLink({ icon }: { icon: ReactNode }) {
     <Link
       href="/admin/login"
       aria-label="Admin login"
-      className="grid size-10 shrink-0 place-items-center rounded-full border border-navy/15 text-navy transition-colors hover:border-gold hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+      className="grid size-10 shrink-0 place-items-center rounded-full border border-white/25 text-white transition-colors hover:border-gold-light hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light"
     >
       {icon}
     </Link>
@@ -109,16 +127,17 @@ export function MobileNavigation() {
 
   return (
     <div className="relative md:hidden">
-      <button
+      <Button
+        variant="custom"
         type="button"
         aria-label={isOpen ? "Cerrar navegación" : "Abrir navegación"}
         aria-expanded={isOpen}
         aria-controls="mobile-site-navigation"
         onClick={() => setIsOpen((open) => !open)}
-        className="grid size-10 place-items-center rounded-full border border-navy/15 text-navy transition-colors hover:border-gold hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+        className="grid size-10 place-items-center rounded-full border border-white/25 text-white transition-colors hover:border-gold-light hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light"
       >
         <Icon name={isOpen ? "close" : "menu"} className="size-5" />
-      </button>
+      </Button>
       {isOpen && (
         <nav
           id="mobile-site-navigation"

@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { login, type LoginState } from "@/app/admin/actions";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 const errors: Record<NonNullable<LoginState["error"]>, string> = {
   setup: "Falta configurar Supabase. Consultá el README.",
@@ -27,7 +28,8 @@ export function LoginForm() {
         <label className="block text-xs font-medium text-slate">Contraseña
           <span className="relative mt-2 block">
             <input required type={passwordVisible ? "text" : "password"} name="password" autoComplete="current-password" className="h-12 w-full border border-navy/15 bg-white px-3 pr-12 text-sm text-navy outline-none focus:border-gold" />
-            <button
+            <Button
+              variant="custom"
               type="button"
               aria-label={passwordVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
               aria-pressed={passwordVisible}
@@ -35,13 +37,13 @@ export function LoginForm() {
               className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center text-slate transition-colors hover:text-navy focus-visible:outline-2 focus-visible:outline-gold"
             >
               <Icon name={passwordVisible ? "eyeOff" : "eye"} className="size-5" />
-            </button>
+            </Button>
           </span>
         </label>
-        <button disabled={pending} aria-busy={pending} className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 bg-navy text-sm font-semibold text-white transition-colors hover:bg-blue-deep disabled:cursor-wait disabled:opacity-70">
+        <Button variant="primary" disabled={pending} aria-busy={pending} className="w-full disabled:cursor-wait disabled:opacity-70">
           {pending && <Icon name="refresh" className="size-4 animate-spin" />}
           {pending ? "Ingresando…" : "Ingresar"}
-        </button>
+        </Button>
       </form>
     </>
   );

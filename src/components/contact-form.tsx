@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 type ContactFormProps = {
   title: string;
@@ -64,7 +65,6 @@ export function ContactForm({ title, neighborhood, whatsappUrl, initialMessage }
   }
 
   const inputClassName = "h-12 min-w-0 rounded-lg border border-navy/50 px-3 text-sm text-navy outline-none placeholder:text-slate/70 focus:border-gold";
-  const buttonClassName = "flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 text-sm font-bold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   const errorClassName = "mt-1 text-xs text-red-700";
 
   return (
@@ -106,12 +106,12 @@ export function ContactForm({ title, neighborhood, whatsappUrl, initialMessage }
         />
         {errors.message && <p id="contact-message-error" className={errorClassName}>{errors.message}</p>}
       </div>
-      <button type="submit" name="contact-via" value="email" className={`${buttonClassName} bg-navy hover:bg-blue-deep`}>
+      <Button type="submit" variant="primary" name="contact-via" value="email" className="w-full rounded-lg px-4">
         Contactar <Icon name="mail" className="size-5 text-gold-light" />
-      </button>
-      <button type="submit" name="contact-via" value="whatsapp" className={`${buttonClassName} bg-[#25d366] hover:bg-[#20bd5a]`}>
+      </Button>
+      <Button type="submit" variant="custom" name="contact-via" value="whatsapp" className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#25d366] px-4 text-sm font-bold text-white hover:bg-[#20bd5a] focus-visible:outline-navy">
         Contactar por WhatsApp <Icon name="whatsapp" className="size-5" />
-      </button>
+      </Button>
     </form>
   );
 }

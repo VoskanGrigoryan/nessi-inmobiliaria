@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type PropertyImage = { path: string; url: string; uploaded: boolean };
@@ -161,11 +162,11 @@ export function ImageUploader({ propertyId, images: initialImages, onUploadingCh
             <span className="px-1">Foto {index + 1}{index === 0 ? " · principal" : ""}</span>
             <input type="hidden" name="image_order" value={image.path} />
             {image.uploaded && <input type="hidden" name="uploaded_images" value={image.path} />}
-            <button type="button" onClick={() => moveImage(index, index - 1)} disabled={index === 0} aria-label={`Mover foto ${index + 1} antes`} className="grid size-7 cursor-pointer place-items-center rounded-full text-slate hover:bg-paper disabled:cursor-default disabled:opacity-30">↑</button>
-            <button type="button" onClick={() => moveImage(index, index + 1)} disabled={index === images.length - 1} aria-label={`Mover foto ${index + 1} después`} className="grid size-7 cursor-pointer place-items-center rounded-full text-slate hover:bg-paper disabled:cursor-default disabled:opacity-30">↓</button>
-            <button type="button" onClick={() => void removeImage(image)} disabled={uploading || Boolean(removingPath)} aria-label={`${removingPath === image.path ? "Quitando" : "Quitar"} foto ${index + 1}`} className="grid size-7 cursor-pointer place-items-center rounded-full text-slate hover:bg-red-50 hover:text-red-700 disabled:cursor-wait disabled:opacity-50">
+            <Button variant="custom" type="button" onClick={() => moveImage(index, index - 1)} disabled={index === 0} aria-label={`Mover foto ${index + 1} antes`} className="grid size-7 place-items-center rounded-full text-slate hover:bg-paper disabled:cursor-default disabled:opacity-30">↑</Button>
+            <Button variant="custom" type="button" onClick={() => moveImage(index, index + 1)} disabled={index === images.length - 1} aria-label={`Mover foto ${index + 1} después`} className="grid size-7 place-items-center rounded-full text-slate hover:bg-paper disabled:cursor-default disabled:opacity-30">↓</Button>
+            <Button variant="custom" type="button" onClick={() => void removeImage(image)} disabled={uploading || Boolean(removingPath)} aria-label={`${removingPath === image.path ? "Quitando" : "Quitar"} foto ${index + 1}`} className="grid size-7 place-items-center rounded-full text-slate hover:bg-red-50 hover:text-red-700 disabled:cursor-wait disabled:opacity-50">
               <Icon name={removingPath === image.path ? "refresh" : "close"} className={`size-4 ${removingPath === image.path ? "animate-spin" : ""}`} />
-            </button>
+            </Button>
           </div>
         ))}
       </div>
