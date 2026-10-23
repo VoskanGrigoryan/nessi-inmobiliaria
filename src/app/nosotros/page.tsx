@@ -86,6 +86,13 @@ export default function AboutPage() {
                   <a className="block w-fit break-all hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="mailto:rosanacnessi@gmail.com">rosanacnessi@gmail.com</a>
                 </div>
               </div>
+              <Image
+                src="/rosana-nessi-logo.png"
+                alt="Rosana Nessi Negocios Inmobiliarios"
+                width={433}
+                height={408}
+                className="mt-8 h-28 w-28 self-end object-contain sm:h-32 sm:w-32"
+              />
             </div>
           </div>
 
@@ -98,14 +105,6 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-
-          <Image
-            src="/rosana-nessi-logo.png"
-            alt="Rosana Nessi Negocios Inmobiliarios"
-            width={433}
-            height={408}
-            className="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden h-44 w-44 -translate-x-1/2 -translate-y-1/2 object-contain shadow-xl lg:block"
-          />
         </div>
       </section>
     </main>
