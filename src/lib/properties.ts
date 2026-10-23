@@ -2,7 +2,17 @@ import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { PropertyFeature } from "@/lib/property-features";
 
-export type Operation = "venta" | "alquiler";
+export type Operation = "venta" | "alquiler" | "alquiler_temporal";
+export const operationLabels: Record<Operation, string> = {
+  venta: "Venta",
+  alquiler: "Alquiler",
+  alquiler_temporal: "Alquiler temporal",
+};
+export const operationBadgeLabels: Record<Operation, string> = {
+  venta: "En venta",
+  alquiler: "En alquiler",
+  alquiler_temporal: "Alquiler temporal",
+};
 export type Orientation = "Norte" | "Noreste" | "Este" | "Sudeste" | "Sur" | "Sudoeste" | "Oeste" | "Noroeste";
 export type Disposition = "Frente" | "Contrafrente" | "Lateral" | "Interno";
 export type PropertyType = "Departamento" | "Casa" | "PH" | "Otro" | "Lote" | "Depósito" | "Local comercial" | "Cochera" | "Oficina";

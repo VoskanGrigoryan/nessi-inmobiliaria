@@ -14,7 +14,7 @@ const values = [
   {
     icon: "home",
     title: "Acompañamiento personalizado",
-    description: "Escuchamos tus objetivos y te acompañamos de cerca durante cada etapa de la compra, venta o alquiler.",
+    description: "Escuchamos tus objetivos y te acompañamos de cerca durante cada etapa de la compra, venta, alquiler o alquiler temporal.",
   },
   {
     icon: "compass",

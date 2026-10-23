@@ -118,7 +118,7 @@ export async function saveProperty(formData: FormData) {
     values.every((value) => Number.isFinite(value) && value >= 0) && Number.isInteger(price) && counts.every(Number.isInteger) &&
     (expenses === null || (Number.isFinite(expenses) && expenses >= 0)) &&
     orientations.includes(orientation) && dispositions.includes(disposition) &&
-    ["venta", "alquiler"].includes(operation) && ["Departamento", "Casa", "PH", "Otro", "Lote", "Depósito", "Local comercial", "Cochera", "Oficina"].includes(propertyType) &&
+    ["venta", "alquiler", "alquiler_temporal"].includes(operation) && ["Departamento", "Casa", "PH", "Otro", "Lote", "Depósito", "Local comercial", "Cochera", "Oficina"].includes(propertyType) &&
     text(formData, "garage_count") !== "" && Number.isInteger(garageCount) && garageCount >= 0 &&
     booleanOptions.includes(text(formData, "accessible_ramp")) && booleanOptions.includes(text(formData, "apto_credito")) &&
     buildingAges.includes(buildingAge) && videoUrl.length <= 500 && isYoutubeUrl(videoUrl) &&

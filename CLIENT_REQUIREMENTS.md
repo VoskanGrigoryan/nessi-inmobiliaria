@@ -16,6 +16,7 @@ Pedidos recibidos para el sitio inmobiliario y en implementación en esta rama.
 12. **Apto crédito:** agregar una opción sí/no.
 13. **Cantidad de cocheras:** reemplazar la opción sí/no por un campo numérico editable que permita indicar cero o más cocheras.
 14. **Página 13 del PDF:** incorporar al sitio la referencia incluida en la página 13 de `inmob-reference.pdf`.
+15. **Operación:** permitir Venta, Alquiler y Alquiler temporal al crear y filtrar propiedades.
 
 ## Revisar al comenzar la implementación
 

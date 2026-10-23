@@ -101,7 +101,7 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
           </div>
           <label className={label}>Operación
             <select name="operation" defaultValue={property?.operation ?? "venta"} className={input}>
-              <option value="venta">Venta</option><option value="alquiler">Alquiler</option>
+              <option value="venta">Venta</option><option value="alquiler">Alquiler</option><option value="alquiler_temporal">Alquiler temporal</option>
             </select>
           </label>
           <label className={label}>Tipo

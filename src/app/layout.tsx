@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     default: "RN Negocios Inmobiliarios",
     template: "%s | RN Negocios Inmobiliarios",
   },
-  description: "Propiedades en venta y alquiler con el asesoramiento cercano de Rosana Nessi.",
+  description: "Propiedades en venta, alquiler y alquiler temporal con el asesoramiento cercano de Rosana Nessi.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

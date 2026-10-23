@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PropertyInteractions } from "@/components/property-interactions";
 import { Icon } from "@/components/icon";
-import { formatPrice, type PropertyCardData } from "@/lib/properties";
+import { formatPrice, operationBadgeLabels, type PropertyCardData } from "@/lib/properties";
 
 export function PropertyCard({ property, eager = false }: { property: PropertyCardData; eager?: boolean }) {
   const address = [property.street, property.streetNumber].filter(Boolean).join(" ");
@@ -26,7 +26,7 @@ export function PropertyCard({ property, eager = false }: { property: PropertyCa
               <div className="grid h-full place-items-center text-gold"><Icon name="home" className="size-12" /></div>
             )}
             <span className="absolute left-3 top-3 bg-navy px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-light">
-              {property.operation === "venta" ? "En venta" : "En alquiler"}
+              {operationBadgeLabels[property.operation]}
             </span>
           </div>
         </Link>

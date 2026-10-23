@@ -20,9 +20,10 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
       <label className="block text-xs font-medium text-slate">
         Operación
         <select name="operation" defaultValue={values.operation ?? ""} className={`${controlClass} mt-2`}>
-          <option value="">Comprar o alquilar</option>
+          <option value="">Cualquier operación</option>
           <option value="venta">Comprar</option>
           <option value="alquiler">Alquilar</option>
+          <option value="alquiler_temporal">Alquiler temporal</option>
         </select>
       </label>
       <label className="block text-xs font-medium text-slate">

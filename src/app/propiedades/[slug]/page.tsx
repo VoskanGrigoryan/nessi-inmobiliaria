@@ -7,7 +7,7 @@ import { PropertyGallery } from "@/components/property-gallery";
 import { PropertyAdminEditLink } from "@/components/property-admin-edit-link";
 import { PropertyInteractions } from "@/components/property-interactions";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
-import { formatPrice, getPropertyBySlug, type BuildingAge } from "@/lib/properties";
+import { formatPrice, getPropertyBySlug, operationBadgeLabels, type BuildingAge } from "@/lib/properties";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getYoutubeEmbedUrl } from "@/lib/youtube";
 
@@ -56,7 +56,7 @@ export default async function PropertyPage({ params }: PageProps) {
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="bg-navy px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-light">
-              {property.operation === "venta" ? "En venta" : "En alquiler"}
+              {operationBadgeLabels[property.operation]}
             </span>
             <span className="text-sm text-muted">{property.type} · {address ? `${address} · ` : ""}{property.neighborhood}, {property.city}</span>
           </div>

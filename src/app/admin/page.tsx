@@ -2,7 +2,7 @@ import Link from "next/link";
 import { DeletePropertyForm } from "@/app/admin/delete-property-form";
 import { LogoutButton } from "@/app/admin/logout-button";
 import { requireAdminContext } from "@/lib/supabase/admin";
-import { getAdminProperties, formatPrice } from "@/lib/properties";
+import { getAdminProperties, formatPrice, operationLabels } from "@/lib/properties";
 import { Icon } from "@/components/icon";
 import { RefreshPropertiesButton } from "@/app/admin/refresh-properties-button";
 import { AdminToast } from "@/app/admin/admin-toast";
@@ -94,7 +94,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                 <CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} />
               </div>
               <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-                <span className="capitalize text-slate">{property.operation}</span>
+                <span className="text-slate">{operationLabels[property.operation]}</span>
                 <span className="text-slate">{property.status === "published" ? "Publicado" : "Borrador"}</span>
                 <span className="font-semibold text-navy">{formatPrice(property.price, property.currency)}</span>
                 <span className="text-slate">{property.rooms} ambientes · {property.area} m²</span>
@@ -134,7 +134,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                     <span className="mt-1 block text-xs font-normal text-muted">{property.rooms} ambientes · {property.area} m² totales</span>
                   </td>
                   <td className="px-4 py-4 text-center"><CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} /></td>
-                  <td className="px-4 py-4 capitalize text-slate">{property.operation}</td>
+                  <td className="px-4 py-4 text-slate">{operationLabels[property.operation]}</td>
                   <td className="px-4 py-4 text-slate">{formatPrice(property.price, property.currency)}</td>
                   <td className="px-4 py-4 text-slate">{property.status === "published" ? "Publicado" : "Borrador"}</td>
                   <td className="px-4 py-4"><div className="flex items-center gap-2">
