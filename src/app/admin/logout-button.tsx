@@ -9,7 +9,7 @@ function LogoutSubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button disabled={pending} className="w-full px-4 py-3 disabled:cursor-wait disabled:opacity-60 sm:w-auto">
+    <Button type="submit" disabled={pending} className="w-full px-4 py-3 disabled:cursor-wait disabled:opacity-60 sm:w-auto">
       <Icon name={pending ? "refresh" : "logout"} className={`size-4 ${pending ? "animate-spin" : ""}`} />
       {pending ? "Cerrando sesión…" : "Cerrar sesión"}
     </Button>

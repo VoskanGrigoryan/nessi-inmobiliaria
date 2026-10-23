@@ -40,7 +40,7 @@ export function LoginForm() {
             </Button>
           </span>
         </label>
-        <Button variant="primary" disabled={pending} aria-busy={pending} className="w-full disabled:cursor-wait disabled:opacity-70">
+        <Button type="submit" variant="primary" disabled={pending} aria-busy={pending} className="w-full disabled:cursor-wait disabled:opacity-70">
           {pending && <Icon name="refresh" className="size-4 animate-spin" />}
           {pending ? "Ingresando…" : "Ingresar"}
         </Button>
