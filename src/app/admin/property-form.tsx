@@ -6,8 +6,9 @@ import { useFormStatus } from "react-dom";
 import type { Property } from "@/lib/properties";
 import { ImageUploader } from "@/app/admin/image-uploader";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 import { isPropertyCity, isPropertyLocation, propertyLocations, type PropertyCity } from "@/lib/property-locations";
-import { propertyAmenities } from "@/lib/property-amenities";
+import { propertyFeatures } from "@/lib/property-features";
 
 function formatThousands(value: string) {
   const [integer, decimal] = value.split(".");
@@ -44,10 +45,10 @@ function PropertyFormActions({ uploading, property }: { uploading: boolean; prop
       >
         <Icon name="close" className="size-4" />Cancelar
       </Link>
-      <button type="submit" disabled={busy} aria-busy={busy} className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 bg-navy px-6 text-sm font-semibold text-white enabled:hover:bg-blue-deep disabled:cursor-wait disabled:opacity-60 sm:w-auto">
+      <Button type="submit" variant="primary" disabled={busy} aria-busy={busy} className="w-full disabled:cursor-wait disabled:opacity-60 sm:w-auto">
         <Icon name={iconName} className={`size-4 ${busy ? "animate-spin" : ""}`} />
         {buttonLabel}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -88,9 +89,9 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
             <div className="flex items-center gap-1">
               <label htmlFor="property-slug">URL del aviso</label>
               <span className="group relative inline-flex">
-                <button type="button" aria-label="Ayuda sobre la URL del aviso" aria-describedby="slug-help" className="cursor-help text-muted hover:text-gold focus-visible:outline-2 focus-visible:outline-gold">
+                <Button type="button" variant="custom" aria-label="Ayuda sobre la URL del aviso" aria-describedby="slug-help" className="inline-flex cursor-help text-muted hover:text-gold">
                   <Icon name="info" className="size-4" />
-                </button>
+                </Button>
                 <span id="slug-help" role="tooltip" className="pointer-events-none absolute left-5 top-0 z-20 w-64 rounded-sm bg-navy px-3 py-2 text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                   No es obligatorio. Si lo dejás vacío, se genera automáticamente a partir del título.
                 </span>
@@ -106,6 +107,7 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
           <label className={label}>Tipo
             <select name="property_type" defaultValue={property?.type ?? "Departamento"} className={input}>
               <option>Departamento</option><option>Casa</option><option>PH</option><option>Otro</option>
+              <option>Lote</option><option>Depósito</option><option>Local comercial</option><option>Cochera</option><option>Oficina</option>
             </select>
           </label>
           <label className={label}>Ciudad
@@ -161,7 +163,7 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
 
       <section className="space-y-4 border-t border-navy/10 pt-6">
         <div>
-          <h2 className="font-semibold text-navy">Características</h2>
+          <h2 className="font-semibold text-navy">Ambientes y superficies</h2>
           <p className="mt-1 text-xs text-muted">Ambientes, superficies y otros detalles de la propiedad.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -170,9 +172,23 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
           <label className={label}>Baños<input required type="number" min="0" name="bathrooms" defaultValue={property?.bathrooms ?? 0} className={input} /></label>
           <label className={label}>Superficie total (m²)<input required type="number" min="0" name="area" defaultValue={property?.area ?? 0} className={input} /></label>
           <label className={label}>Superficie cubierta (m²)<input required type="number" min="0" name="covered_area" defaultValue={property?.coveredArea ?? 0} className={input} /></label>
-          <label className={label}>Cochera
-            <select name="has_garage" defaultValue={property?.hasGarage ? "true" : "false"} className={input}>
-              <option value="false">No tiene</option><option value="true">Tiene</option>
+          <label className={label}>Superficie descubierta (m²)<input required type="number" min="0" name="uncovered_area" defaultValue={property?.uncoveredArea ?? 0} className={input} /></label>
+          <label className={label}>Superficie semicubierta (m²)<input required type="number" min="0" name="semi_covered_area" defaultValue={property?.semiCoveredArea ?? 0} className={input} /></label>
+          <label className={label}>Cantidad de cocheras<input required type="number" min="0" step="1" name="garage_count" defaultValue={property?.garageCount ?? 0} className={input} /></label>
+          <label className={label}>Antigüedad del edificio
+            <select name="building_age" defaultValue={property?.buildingAge ?? ""} className={input}>
+              <option value="">Sin especificar</option>
+              <option>En pozo</option><option>A estrenar</option><option>1 a 10</option><option>10 a 20</option><option>20+</option>
+            </select>
+          </label>
+          <label className={label}>Rampa para discapacitados
+            <select name="accessible_ramp" defaultValue={property?.accessibleRamp ? "true" : "false"} className={input}>
+              <option value="true">Sí</option><option value="false">No</option>
+            </select>
+          </label>
+          <label className={label}>Apto crédito
+            <select name="apto_credito" defaultValue={property?.aptoCredito ? "true" : "false"} className={input}>
+              <option value="true">Sí</option><option value="false">No</option>
             </select>
           </label>
           <label className={label}>Orientación (opcional)
@@ -184,7 +200,7 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
           </label>
           <label className={label}>Disposición (opcional)
             <select name="disposition" defaultValue={property?.disposition ?? ""} className={input}>
-              <option value="">Sin especificar</option><option>Frente</option><option>Contrafrente</option>
+              <option value="">Sin especificar</option><option>Frente</option><option>Contrafrente</option><option>Lateral</option><option>Interno</option>
             </select>
           </label>
         </div>
@@ -192,14 +208,14 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
 
       <section className="space-y-4 border-t border-navy/10 pt-6">
         <div>
-          <h2 className="font-semibold text-navy">Amenities</h2>
+          <h2 className="font-semibold text-navy">Características</h2>
           <p className="mt-1 text-xs text-muted">Seleccioná los servicios y espacios que ofrece la propiedad.</p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
-          {propertyAmenities.map((amenity) => (
-            <label key={amenity} className="flex cursor-pointer items-center gap-2 border border-navy/10 bg-white px-3 py-2 text-sm text-slate hover:border-gold">
-              <input type="checkbox" name="amenities" value={amenity} defaultChecked={property?.amenities?.includes(amenity)} />
-              {amenity}
+          {propertyFeatures.map((feature) => (
+            <label key={feature} className="flex cursor-pointer items-center gap-2 border border-navy/10 bg-white px-3 py-2 text-sm text-slate hover:border-gold">
+              <input type="checkbox" name="characteristics" value={feature} defaultChecked={property?.characteristics?.includes(feature)} />
+              {feature}
             </label>
           ))}
         </div>
@@ -212,6 +228,9 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
         </div>
         <label className={label}>Descripción
           <textarea name="description" rows={5} defaultValue={property?.description} className="mt-1 w-full border border-navy/15 bg-white p-3 text-sm text-navy outline-none focus:border-gold" />
+        </label>
+        <label className={label}>Video de YouTube (opcional)
+          <input type="url" name="video_url" maxLength={500} defaultValue={property?.videoUrl ?? ""} placeholder="https://www.youtube.com/watch?v=..." className={input} />
         </label>
         <ImageUploader propertyId={propertyId} onUploadingChange={setUploading} images={(property?.gallery ?? []).map((url, index) => ({
           url,

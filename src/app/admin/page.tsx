@@ -8,14 +8,35 @@ import { RefreshPropertiesButton } from "@/app/admin/refresh-properties-button";
 import { AdminToast } from "@/app/admin/admin-toast";
 import { EditPropertyLink, ViewPropertyLink } from "@/app/admin/edit-property-link";
 import { CopyPropertyLink } from "@/app/admin/copy-property-link";
+import { Button } from "@/components/button";
+import { IconHeart } from "@tabler/icons-react";
 
-type PageProps = { searchParams: Promise<{ notice?: string; error?: string }> };
+type PageProps = { searchParams: Promise<{ notice?: string; error?: string; favorites?: string }> };
+
+function FavoriteMarker() {
+  return (
+    <span title="Propiedad en favoritos" className="inline-flex shrink-0 translate-y-0.5 text-red-600">
+      <IconHeart aria-hidden="true" className="size-4 fill-current" />
+      <span className="sr-only">En favoritos</span>
+    </span>
+  );
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage({ searchParams }: PageProps) {
-  const { email } = await requireAdminContext();
-  const [properties, params] = await Promise.all([getAdminProperties(), searchParams]);
+  const { email, userId, supabase } = await requireAdminContext();
+  const [properties, params, favoriteResult] = await Promise.all([
+    getAdminProperties(),
+    searchParams,
+    supabase.from("property_favorites").select("property_id").eq("user_id", userId),
+  ]);
+  const favoritePropertyIds = new Set((favoriteResult.data ?? []).map(({ property_id }) => property_id));
+  const favoriteFilter = params.favorites === "yes" || params.favorites === "no" ? params.favorites : "all";
+  const visibleProperties = properties.filter((property) => {
+    const isFavorite = Boolean(property.id && favoritePropertyIds.has(property.id));
+    return favoriteFilter === "all" || (favoriteFilter === "yes" ? isFavorite : !isFavorite);
+  });
   const noticeMessage = params.notice === "saved"
     ? "La propiedad se guardó correctamente."
     : params.notice === "deleted"
@@ -43,17 +64,30 @@ export default async function AdminPage({ searchParams }: PageProps) {
         <AdminToast variant="success" message={noticeMessage} />
       ) : null}
 
-      {properties.length ? (
+      <form action="/admin" method="get" className="mt-8 flex flex-wrap items-center gap-2">
+        <label htmlFor="favorite-filter" className="text-sm font-medium text-navy">Filtrar por favoritos</label>
+        <select id="favorite-filter" name="favorites" defaultValue={favoriteFilter} className="h-10 rounded-md border border-navy/15 bg-white px-3 text-sm text-navy">
+          <option value="all">Todas las propiedades</option>
+          <option value="yes">En favoritos</option>
+          <option value="no">No favoritas</option>
+        </select>
+        <Button type="submit">Filtrar</Button>
+      </form>
+
+      {visibleProperties.length ? (
         <>
         <div className="mt-8 grid gap-3 md:hidden">
-          {properties.map((property) => (
+          {visibleProperties.map((property) => (
             <article key={property.id} className="min-w-0 border border-navy/10 bg-white p-4">
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="break-words font-semibold text-navy">
-                    {property.status === "published" ? (
-                      <ViewPropertyLink href={`/propiedades/${property.slug}`} title={property.title} />
-                    ) : property.title}
+                  <h2 className="flex items-start gap-2 break-words font-semibold text-navy">
+                    <span className="min-w-0 break-words">
+                      {property.status === "published" ? (
+                        <ViewPropertyLink href={`/propiedades/${property.slug}`} title={property.title} />
+                      ) : property.title}
+                    </span>
+                    {property.id && favoritePropertyIds.has(property.id) && <FavoriteMarker />}
                   </h2>
                   <p className="mt-1 text-sm text-muted">{property.neighborhood}, {property.city}</p>
                 </div>
@@ -85,12 +119,17 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <tr><th className="px-4 py-3">Propiedad</th><th className="px-4 py-3 text-center">Enlace</th><th className="px-4 py-3">Operación</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Acciones</th></tr>
             </thead>
             <tbody>
-              {properties.map((property) => (
+              {visibleProperties.map((property) => (
                 <tr key={property.id} className="border-b border-navy/10 last:border-0">
                   <td className="break-words px-4 py-4 font-medium text-navy">
-                    {property.status === "published" ? (
-                      <ViewPropertyLink href={`/propiedades/${property.slug}`} title={property.title} />
-                    ) : property.title}
+                    <div className="flex items-start gap-2">
+                      <span className="min-w-0">
+                        {property.status === "published" ? (
+                          <ViewPropertyLink href={`/propiedades/${property.slug}`} title={property.title} />
+                        ) : property.title}
+                      </span>
+                      {property.id && favoritePropertyIds.has(property.id) && <FavoriteMarker />}
+                    </div>
                     <span className="mt-1 block text-xs font-normal text-muted">{property.neighborhood}, {property.city}</span>
                     <span className="mt-1 block text-xs font-normal text-muted">{property.rooms} ambientes · {property.area} m² totales</span>
                   </td>
@@ -109,7 +148,9 @@ export default async function AdminPage({ searchParams }: PageProps) {
         </div>
         </>
       ) : (
-        <div className="mt-8 border border-navy/10 bg-white p-8 text-sm text-slate">Todavía no hay propiedades. Creá la primera para empezar.</div>
+        <div className="mt-8 border border-navy/10 bg-white p-8 text-sm text-slate">
+          {properties.length ? "No hay propiedades que coincidan con este filtro." : "Todavía no hay propiedades. Creá la primera para empezar."}
+        </div>
       )}
     </main>
   );

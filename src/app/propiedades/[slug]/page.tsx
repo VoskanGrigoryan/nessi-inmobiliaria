@@ -5,11 +5,19 @@ import { Icon } from "@/components/icon";
 import { ContactForm } from "@/components/contact-form";
 import { PropertyGallery } from "@/components/property-gallery";
 import { PropertyAdminEditLink } from "@/components/property-admin-edit-link";
+import { PropertyInteractions } from "@/components/property-interactions";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
-import { formatPrice, getPropertyBySlug } from "@/lib/properties";
+import { formatPrice, getPropertyBySlug, type BuildingAge } from "@/lib/properties";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
+import { getYoutubeEmbedUrl } from "@/lib/youtube";
 
 type PageProps = { params: Promise<{ slug: string }> };
+
+function formatBuildingAge(age: BuildingAge) {
+  if (age === "20+") return "20+ años";
+  if (age === "En pozo" || age === "A estrenar") return age;
+  return `${age} años`;
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -23,15 +31,19 @@ export default async function PropertyPage({ params }: PageProps) {
   if (!property) notFound();
 
   const address = [property.street, property.streetNumber].filter(Boolean).join(" ");
+  const mapQuery = [address, property.neighborhood, property.city].filter(Boolean).join(", ");
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+  const videoEmbedUrl = getYoutubeEmbedUrl(property.videoUrl);
   const whatsappUrl = getWhatsAppUrl(`Hola, me interesa la propiedad “${property.title}” en ${property.neighborhood}. ¿Podrían enviarme más información?`);
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 py-8 sm:px-5 sm:py-12 lg:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <BackLink href="/propiedades" label="Volver a propiedades" />
-        {property.id && (
-          <PropertyAdminEditLink propertyId={property.id} />
-        )}
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {property.id && <PropertyAdminEditLink propertyId={property.id} />}
+          <PropertyInteractions propertyId={property.id} title={property.title} />
+        </div>
       </div>
 
       <WhatsAppFloat property={{ title: property.title, neighborhood: property.neighborhood }} />
@@ -66,20 +78,49 @@ export default async function PropertyPage({ params }: PageProps) {
               <div className="flex items-center gap-2"><Icon name="bath" className="size-5 text-gold" />{property.bathrooms} baños</div>
               <div className="flex items-center gap-2"><Icon name="area" className="size-5 shrink-0 text-gold" />{property.area} m² totales</div>
               <div className="flex items-center gap-2"><Icon name="area" className="size-5 shrink-0 text-gold" />{property.coveredArea} m² cubiertos</div>
+              {property.uncoveredArea != null && property.uncoveredArea > 0 && <div className="flex items-center gap-2"><Icon name="area" className="size-5 shrink-0 text-gold" />{property.uncoveredArea} m² descubiertos</div>}
+              {property.semiCoveredArea != null && property.semiCoveredArea > 0 && <div className="flex items-center gap-2"><Icon name="area" className="size-5 shrink-0 text-gold" />{property.semiCoveredArea} m² semicubiertos</div>}
+              {property.garageCount != null && <div className="flex items-center gap-2"><Icon name="garage" className="size-5 shrink-0 text-gold" />{property.garageCount} cocheras</div>}
+              {property.buildingAge && <div className="flex items-center gap-2"><Icon name="building" className="size-5 shrink-0 text-gold" />Antigüedad: {formatBuildingAge(property.buildingAge)}</div>}
               {property.orientation && <div className="flex items-center gap-2"><Icon name="compass" className="size-5 shrink-0 text-gold" />Orientación: {property.orientation}</div>}
               {property.disposition && <div className="flex items-center gap-2"><Icon name="building" className="size-5 shrink-0 text-gold" />Disposición: {property.disposition}</div>}
-              {property.hasGarage && <div className="flex items-center gap-2"><Icon name="garage" className="size-5 shrink-0 text-gold" />Cochera</div>}
+              {property.accessibleRamp != null && <div className="flex items-center gap-2"><Icon name="building" className="size-5 shrink-0 text-gold" />Rampa para discapacitados: {property.accessibleRamp ? "Sí" : "No"}</div>}
+              {property.aptoCredito != null && <div className="flex items-center gap-2"><Icon name="check" className="size-5 shrink-0 text-gold" />Apto crédito: {property.aptoCredito ? "Sí" : "No"}</div>}
             </div>
           </div>
 
-          {property.amenities.length > 0 && (
+          {property.characteristics.length > 0 && (
             <section className="mt-8">
-              <h2 className="font-editorial text-2xl text-navy">Amenities</h2>
+              <h2 className="font-editorial text-2xl text-navy">Características</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
-                {property.amenities.map((amenity) => (
-                  <li key={amenity} className="border border-navy/10 bg-white px-3 py-2 text-sm text-slate">{amenity}</li>
+                {property.characteristics.map((feature) => (
+                  <li key={feature} className="border border-navy/10 bg-white px-3 py-2 text-sm text-slate">{feature}</li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          <section className="mt-8">
+            <h2 className="font-editorial text-2xl text-navy">Ubicación</h2>
+            <p className="mt-2 text-sm text-slate">{mapQuery}</p>
+            <a href={mapUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex h-11 items-center gap-2 bg-navy px-4 text-sm font-semibold text-white transition-colors hover:bg-blue-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
+              <Icon name="pin" className="size-4 text-gold-light" />Ver en Google Maps
+            </a>
+          </section>
+
+          {videoEmbedUrl && (
+            <section className="mt-8">
+              <h2 className="font-editorial text-2xl text-navy">Video</h2>
+              <div className="mt-3 aspect-video overflow-hidden bg-navy">
+                <iframe
+                  src={videoEmbedUrl}
+                  title={`Video de ${property.title}`}
+                  className="size-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
             </section>
           )}
 

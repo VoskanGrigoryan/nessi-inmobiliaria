@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
 
@@ -26,8 +27,8 @@ export default function AboutPage() {
   return (
     <main>
       <section className="bg-paper">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 sm:py-24 md:grid-cols-[1.3fr_0.7fr] md:items-center">
-          <div>
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
+          <div className="max-w-4xl">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">RN Negocios Inmobiliarios</p>
             <h1 className="mt-4 max-w-3xl font-editorial text-4xl leading-tight text-navy sm:text-6xl">
               Tu próxima decisión inmobiliaria, con claridad y respaldo.
@@ -44,11 +45,11 @@ export default function AboutPage() {
               </Link>
             </div>
           </div>
-          <aside className="border-l-2 border-gold bg-navy p-7 text-white sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">Atención profesional</p>
-            <p className="mt-4 font-editorial text-3xl">Rosana Nessi</p>
-            <p className="mt-3 text-sm leading-6 text-white/75">Martillera Pública<br />Matrícula CUCICBA 9935</p>
-          </aside>
+          <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 border-l-2 border-gold bg-navy px-5 py-3 text-white">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">Martillera P&uacute;blica</span>
+            <span aria-hidden="true" className="text-gold-light">&middot;</span>
+            <span className="text-sm font-semibold">Matr&iacute;cula CUCICBA 9935</span>
+          </div>
         </div>
       </section>
 
@@ -68,6 +69,43 @@ export default function AboutPage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="bg-paper px-4 py-12 sm:px-6 sm:py-16" aria-labelledby="thanks-heading">
+        <div className="relative mx-auto grid max-w-7xl overflow-hidden border-y-4 border-gold bg-navy text-white md:grid-cols-2">
+          <div className="relative min-h-[24rem]">
+            <Image src="/contact-reference-left.jpg" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+            <div aria-hidden="true" className="absolute inset-0 bg-navy/35" />
+            <div className="relative flex min-h-[24rem] flex-col justify-between p-7 sm:p-10 lg:p-12">
+              <div>
+                <h2 id="thanks-heading" className="font-editorial text-4xl leading-tight text-white sm:text-5xl">Muchas gracias</h2>
+                <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-gold-light">Contacto</p>
+                <div className="mt-4 space-y-2 text-sm sm:text-base">
+                  <a className="block w-fit hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="tel:+5491134823030">+54 9 11 3482 3030</a>
+                  <a className="block w-fit break-all hover:text-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light" href="mailto:rosanacnessi@gmail.com">rosanacnessi@gmail.com</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative min-h-[24rem]">
+            <Image src="/contact-reference-right.jpg" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+            <div aria-hidden="true" className="absolute inset-0 bg-navy/60" />
+            <div className="relative flex min-h-[24rem] items-center p-7 sm:p-10 lg:p-14">
+              <p className="max-w-lg text-base leading-8 text-white sm:text-lg">
+                En RN Negocios Inmobiliarios creemos que vender o comprar una propiedad es mucho m&aacute;s que una transacci&oacute;n. Por eso ofrecemos un servicio basado en la confianza, la transparencia, el asesoramiento profesional y el compromiso permanente con nuestros clientes, acompa&ntilde;&aacute;ndolos en cada paso del proceso hasta alcanzar sus objetivos.
+              </p>
+            </div>
+          </div>
+
+          <Image
+            src="/rosana-nessi-logo.png"
+            alt="Rosana Nessi Negocios Inmobiliarios"
+            width={433}
+            height={408}
+            className="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden h-44 w-44 -translate-x-1/2 -translate-y-1/2 object-contain shadow-xl lg:block"
+          />
         </div>
       </section>
     </main>

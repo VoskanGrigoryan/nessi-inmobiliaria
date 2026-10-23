@@ -39,6 +39,7 @@ export async function requireAdminContext() {
 
   return {
     supabase,
+    userId,
     email: typeof claims?.email === "string" ? claims.email : null,
   };
 }

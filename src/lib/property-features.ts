@@ -1,4 +1,4 @@
-export const propertyAmenities = [
+export const propertyFeatures = [
   "Balcón",
   "Terraza",
   "Patio",
@@ -12,6 +12,7 @@ export const propertyAmenities = [
   "Aire acondicionado",
   "Calefacción",
   "Seguridad 24 hs",
+  "Laundry",
 ] as const;
 
-export type PropertyAmenity = (typeof propertyAmenities)[number];
+export type PropertyFeature = (typeof propertyFeatures)[number];

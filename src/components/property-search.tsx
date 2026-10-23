@@ -1,4 +1,5 @@
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 type SearchValues = {
   operation?: string;
@@ -41,6 +42,11 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
           <option>Casa</option>
           <option>PH</option>
           <option>Otro</option>
+          <option>Lote</option>
+          <option>Depósito</option>
+          <option>Local comercial</option>
+          <option>Cochera</option>
+          <option>Oficina</option>
         </select>
       </label>
       <label className="block text-xs font-medium text-slate">
@@ -53,10 +59,10 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
           <option value="4">4 o más</option>
         </select>
       </label>
-      <button className={`inline-flex h-12 items-center justify-center gap-2 rounded-sm bg-navy px-6 text-sm font-semibold text-white transition-colors hover:bg-blue-deep ${compact ? "sm:col-span-2 lg:col-span-1" : "lg:px-7"}`}>
+      <Button type="submit" variant="primary" className={`rounded-sm ${compact ? "sm:col-span-2 lg:col-span-1" : "lg:px-7"}`}>
         <Icon name="search" className="size-4" />
         Buscar propiedades
-      </button>
+      </Button>
     </form>
   );
 }

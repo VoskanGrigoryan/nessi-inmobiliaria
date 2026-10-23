@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 export function CopyPropertyLink({ href, title, disabled = false }: { href: string; title: string; disabled?: boolean }) {
   const [feedback, setFeedback] = useState<"copied" | "error" | null>(null);
@@ -25,7 +26,8 @@ export function CopyPropertyLink({ href, title, disabled = false }: { href: stri
   }
 
   return (
-    <button
+    <Button
+      variant="custom"
       type="button"
       disabled={disabled}
       onClick={copyLink}
@@ -35,6 +37,6 @@ export function CopyPropertyLink({ href, title, disabled = false }: { href: stri
     >
       <Icon name={feedback === "copied" ? "check" : "copy"} className="size-4" />
       {feedback && <span className="sr-only" role="status">{feedback === "copied" ? "Enlace copiado" : "No se pudo copiar el enlace"}</span>}
-    </button>
+    </Button>
   );
 }

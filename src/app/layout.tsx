@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteHeaderAuthProvider } from "@/components/site-header-auth";
+import { PropertyFavoritesProvider } from "@/components/property-favorites";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
 import "./globals.css";
 
@@ -19,8 +20,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="es">
       <body className="flex min-h-screen flex-col bg-paper text-navy antialiased">
         <SiteHeaderAuthProvider>
-          <SiteHeader />
-          <div className="flex flex-1 flex-col">{children}</div>
+          <PropertyFavoritesProvider>
+            <SiteHeader />
+            <div className="flex flex-1 flex-col">{children}</div>
+          </PropertyFavoritesProvider>
         </SiteHeaderAuthProvider>
         <SiteFooter />
         <WhatsAppFloat />

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
 
 export function PropertyGallery({ images, title }: { images: string[]; title: string }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -57,7 +58,8 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
   return (
     <>
       <div className={`grid gap-3 overflow-hidden sm:rounded-sm ${images.length > 1 ? "sm:grid-cols-[1.6fr_1fr]" : ""}`}>
-        <button
+        <Button
+          variant="custom"
           type="button"
           aria-label={`Ampliar foto 1 de ${title}`}
           onClick={() => showImage(0)}
@@ -67,12 +69,13 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
           <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
             <Icon name="expand" className="size-4" />
           </span>
-        </button>
+        </Button>
 
         {images.length > 1 && (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
             {images.slice(1, 3).map((image, index) => (
-              <button
+              <Button
+                variant="custom"
                 key={index}
                 type="button"
                 aria-label={`Ampliar foto ${index + 2} de ${title}`}
@@ -83,7 +86,7 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
                 <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
                   <Icon name="expand" className="size-4" />
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -131,17 +134,17 @@ export function PropertyGallery({ images, title }: { images: string[]; title: st
               />
             </div>
 
-            <button type="button" aria-label="Cerrar galería" onClick={() => dialogRef.current?.close()} className="absolute right-4 top-4 z-10 grid size-11 cursor-pointer place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            <Button variant="custom" type="button" aria-label="Cerrar galería" onClick={() => dialogRef.current?.close()} className="absolute right-4 top-4 z-10 grid size-11 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white">
               <Icon name="close" className="size-6" />
-            </button>
+            </Button>
             {images.length > 1 && (
               <>
-                <button type="button" aria-label="Foto anterior" onClick={() => moveImage(-1)} className="absolute left-3 top-1/2 z-10 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:left-5">
+                <Button variant="custom" type="button" aria-label="Foto anterior" onClick={() => moveImage(-1)} className="absolute left-3 top-1/2 z-10 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white sm:left-5">
                   <Icon name="previous" className="size-6" />
-                </button>
-                <button type="button" aria-label="Foto siguiente" onClick={() => moveImage(1)} className="absolute right-3 top-1/2 z-10 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-5">
+                </Button>
+                <Button variant="custom" type="button" aria-label="Foto siguiente" onClick={() => moveImage(1)} className="absolute right-3 top-1/2 z-10 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white sm:right-5">
                   <Icon name="next" className="size-6" />
-                </button>
+                </Button>
               </>
             )}
             <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-sm text-white/80">
