@@ -7,19 +7,49 @@ export const metadata: Metadata = { title: "Nosotros" };
 
 const values = [
   {
-    icon: "building",
+    icon: "check",
     title: "Transparencia en cada operación",
     description: "Trabajamos con información clara, procesos definidos y una comunicación honesta para que nuestros clientes tomen decisiones con confianza.",
   },
   {
     icon: "home",
-    title: "Acompañamiento personalizado",
-    description: "Escuchamos tus objetivos y te acompañamos de cerca durante cada etapa de la compra, venta, alquiler o alquiler temporal.",
+    title: "Atención personalizada",
+    description: "Cada cliente y cada propiedad tienen necesidades diferentes. Diseñamos estrategias a medida para alcanzar los mejores resultados.",
+  },
+  {
+    icon: "mail",
+    title: "Contacto directo y acompañamiento permanente",
+    description: "Mantenemos una comunicación cercana y constante durante todo el proceso, brindando respuestas rápidas y seguimiento continuo.",
   },
   {
     icon: "compass",
-    title: "Asesoramiento profesional",
-    description: "Recibís orientación directa de una martillera pública matriculada para avanzar con claridad y seguridad.",
+    title: "Consultoría y asesoramiento integral",
+    description: "No solo comercializamos propiedades; asesoramos estratégicamente a nuestros clientes en cada etapa de la operación.",
+  },
+  {
+    icon: "search",
+    title: "Valoraciones respaldadas por datos reales",
+    description: "Realizamos Estudios Comparativos de Mercado y análisis de tendencias para determinar precios competitivos y alineados con la realidad del mercado.",
+  },
+  {
+    icon: "building",
+    title: "Seguridad y confianza",
+    description: "Supervisamos cada detalle documental, legal y comercial para garantizar operaciones seguras y transparentes.",
+  },
+  {
+    icon: "userKey",
+    title: "Equipo interdisciplinario de profesionales",
+    description: "Contamos con una red de corredores inmobiliarios matriculados, contadores públicos, abogados especializados, arquitectos y profesionales en diseño de interiores y home staging.",
+  },
+  {
+    icon: "eye",
+    title: "Marketing inmobiliario de alto impacto",
+    description: "Utilizamos herramientas digitales, portales especializados, redes sociales, fotografía profesional y estrategias comerciales para maximizar la visibilidad de cada propiedad.",
+  },
+  {
+    icon: "check",
+    title: "Negociación profesional",
+    description: "Representamos los intereses de nuestros clientes buscando las mejores condiciones económicas y contractuales.",
   },
 ] as const;
 
