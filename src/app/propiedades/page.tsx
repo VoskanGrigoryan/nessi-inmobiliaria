@@ -19,7 +19,7 @@ type SearchParams = Promise<{
 
 function parsePrice(value?: string) {
   if (!value?.trim()) return undefined;
-  const price = Number(value);
+  const price = Number(value.replace(/\./g, ""));
   return Number.isFinite(price) && price >= 0 ? price : undefined;
 }
 

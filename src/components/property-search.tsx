@@ -1,6 +1,7 @@
 import { Icon } from "@/components/icon";
 import { Button } from "@/components/button";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
+import { FormattedAmountInput } from "@/components/formatted-amount-input";
 import { propertySubtypes } from "@/lib/property-subtypes";
 
 type SearchValues = {
@@ -94,11 +95,11 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
           </label>
           <label className="block text-xs font-medium text-slate">
             Precio mínimo
-            <input type="number" min="0" step="1" name="minimumPrice" defaultValue={values.minimumPrice ?? ""} placeholder="Sin mínimo" className={`${controlClass} mt-2`} />
+            <FormattedAmountInput name="minimumPrice" value={values.minimumPrice} placeholder="Sin mínimo" className={`${controlClass} mt-2`} />
           </label>
           <label className="block text-xs font-medium text-slate">
             Precio máximo
-            <input type="number" min="0" step="1" name="maximumPrice" defaultValue={values.maximumPrice ?? ""} placeholder="Sin máximo" className={`${controlClass} mt-2`} />
+            <FormattedAmountInput name="maximumPrice" value={values.maximumPrice} placeholder="Sin máximo" className={`${controlClass} mt-2`} />
           </label>
           <label className="block text-xs font-medium text-slate sm:col-span-2 lg:col-span-1">
             Ordenar por
