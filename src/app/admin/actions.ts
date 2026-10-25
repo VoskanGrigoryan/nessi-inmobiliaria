@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { publishedPropertiesCacheTag } from "@/lib/properties";
 import { isPropertyLocation } from "@/lib/property-locations";
 import { propertyFeatures } from "@/lib/property-features";
+import { propertySubtypes } from "@/lib/property-subtypes";
 import { isYoutubeUrl } from "@/lib/youtube";
 
 export type LoginState = { error?: "setup" | "invalid" | "unauthorized" };
@@ -86,6 +87,7 @@ export async function saveProperty(formData: FormData) {
   const slug = slugify(text(formData, "slug") || title);
   const operation = text(formData, "operation");
   const propertyType = text(formData, "property_type");
+  const propertySubtype = text(formData, "property_subtype");
   const characteristics = formData.getAll("characteristics").map(String);
   const status = text(formData, "status");
   const currency = text(formData, "currency");
@@ -119,6 +121,7 @@ export async function saveProperty(formData: FormData) {
     (expenses === null || (Number.isFinite(expenses) && expenses >= 0)) &&
     orientations.includes(orientation) && dispositions.includes(disposition) &&
     ["venta", "alquiler", "alquiler_temporal"].includes(operation) && ["Departamento", "Casa", "PH", "Otro", "Lote", "Depósito", "Local comercial", "Cochera", "Oficina"].includes(propertyType) &&
+    (!propertySubtype || propertySubtypes.some((subtype) => subtype === propertySubtype)) &&
     text(formData, "garage_count") !== "" && Number.isInteger(garageCount) && garageCount >= 0 &&
     booleanOptions.includes(text(formData, "accessible_ramp")) && booleanOptions.includes(text(formData, "apto_credito")) &&
     buildingAges.includes(buildingAge) && videoUrl.length <= 500 && isYoutubeUrl(videoUrl) &&
@@ -155,6 +158,7 @@ export async function saveProperty(formData: FormData) {
     title,
     operation,
     property_type: propertyType,
+    property_subtype: propertySubtype || null,
     neighborhood,
     city,
     street,

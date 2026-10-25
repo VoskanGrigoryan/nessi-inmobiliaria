@@ -90,6 +90,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                     {property.id && favoritePropertyIds.has(property.id) && <FavoriteMarker />}
                   </h2>
                   <p className="mt-1 text-sm text-muted">{property.neighborhood}, {property.city}</p>
+                  <p className="mt-1 text-xs text-muted">{property.type}{property.subtype ? ` · ${property.subtype}` : ""}</p>
                 </div>
                 <CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} />
               </div>
@@ -131,6 +132,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                       {property.id && favoritePropertyIds.has(property.id) && <FavoriteMarker />}
                     </div>
                     <span className="mt-1 block text-xs font-normal text-muted">{property.neighborhood}, {property.city}</span>
+                    <span className="mt-1 block text-xs font-normal text-muted">{property.type}{property.subtype ? ` · ${property.subtype}` : ""}</span>
                     <span className="mt-1 block text-xs font-normal text-muted">{property.rooms} ambientes · {property.area} m² totales</span>
                   </td>
                   <td className="px-4 py-4 text-center"><CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} /></td>

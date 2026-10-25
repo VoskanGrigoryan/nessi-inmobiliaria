@@ -1,10 +1,12 @@
 import { Icon } from "@/components/icon";
 import { Button } from "@/components/button";
+import { propertySubtypes } from "@/lib/property-subtypes";
 
 type SearchValues = {
   operation?: string;
   location?: string;
   type?: string;
+  subtype?: string;
   rooms?: string;
 };
 
@@ -15,7 +17,7 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
     <form
       action="/propiedades"
       method="get"
-      className={`grid gap-3 rounded-sm bg-white p-4 shadow-[0_18px_55px_rgba(1,22,51,0.12)] sm:grid-cols-2 ${compact ? "lg:grid-cols-[1fr_1.35fr_1fr_0.8fr_auto] lg:items-end" : "lg:grid-cols-[1fr_1.5fr_1fr_0.8fr_auto] lg:items-end lg:p-6"}`}
+      className={`grid gap-3 rounded-sm bg-white p-4 shadow-[0_18px_55px_rgba(1,22,51,0.12)] sm:grid-cols-2 ${compact ? "lg:grid-cols-[1fr_1.35fr_1fr_1fr_0.8fr_auto] lg:items-end" : "lg:grid-cols-[1fr_1.5fr_1fr_1fr_0.8fr_auto] lg:items-end lg:p-6"}`}
     >
       <label className="block text-xs font-medium text-slate">
         Operación
@@ -48,6 +50,13 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
           <option>Local comercial</option>
           <option>Cochera</option>
           <option>Oficina</option>
+        </select>
+      </label>
+      <label className="block text-xs font-medium text-slate">
+        Subtipo de propiedad
+        <select name="subtype" defaultValue={values.subtype ?? ""} className={`${controlClass} mt-2`}>
+          <option value="">Todos los subtipos</option>
+          {propertySubtypes.map((subtype) => <option key={subtype}>{subtype}</option>)}
         </select>
       </label>
       <label className="block text-xs font-medium text-slate">

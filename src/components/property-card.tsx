@@ -40,7 +40,8 @@ export function PropertyCard({ property, eager = false }: { property: PropertyCa
           {address || `${property.neighborhood}, ${property.city}`}
         </p>
         {address && <p className="mt-1 text-xs text-muted">{property.neighborhood}, {property.city}</p>}
-        <h3 className="mt-2 min-h-14 font-editorial text-xl leading-7 text-navy group-hover:text-blue-deep">
+        <p className="mt-2 text-xs font-medium text-muted">{property.type}{property.subtype ? ` · ${property.subtype}` : ""}</p>
+        <h3 className="mt-1 min-h-14 font-editorial text-xl leading-7 text-navy group-hover:text-blue-deep">
           {property.title}
         </h3>
         <p className="mt-3 text-lg font-semibold text-navy">

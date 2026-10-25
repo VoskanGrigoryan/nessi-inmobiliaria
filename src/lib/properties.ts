@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { PropertyFeature } from "@/lib/property-features";
+import type { PropertySubtype } from "@/lib/property-subtypes";
 
 export type Operation = "venta" | "alquiler" | "alquiler_temporal";
 export const operationLabels: Record<Operation, string> = {
@@ -24,6 +25,7 @@ export type Property = {
   title: string;
   operation: Operation;
   type: PropertyType;
+  subtype?: PropertySubtype | null;
   neighborhood: string;
   city: string;
   street?: string;
@@ -63,6 +65,7 @@ export type PropertyCardData = Pick<
   | "title"
   | "operation"
   | "type"
+  | "subtype"
   | "neighborhood"
   | "city"
   | "street"
@@ -83,6 +86,7 @@ type PropertyRow = {
   title: string;
   operation: Operation;
   property_type: PropertyType;
+  property_subtype: PropertySubtype | null;
   neighborhood: string;
   city: string;
   street: string;
@@ -119,6 +123,7 @@ type PropertyCardRow = Pick<
   | "title"
   | "operation"
   | "property_type"
+  | "property_subtype"
   | "neighborhood"
   | "city"
   | "street"
@@ -262,6 +267,7 @@ function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Pr
     title: row.title,
     operation: row.operation,
     type: row.property_type,
+    subtype: row.property_subtype,
     neighborhood: row.neighborhood,
     city: row.city,
     street: row.street,
@@ -306,6 +312,7 @@ function toPropertyCardData(
     title: row.title,
     operation: row.operation,
     type: row.property_type,
+    subtype: row.property_subtype,
     neighborhood: row.neighborhood,
     city: row.city,
     street: row.street,
@@ -328,6 +335,7 @@ function escapeLikeFilter(value: string) {
 type PropertyFilters = {
   operation?: string;
   type?: string;
+  subtype?: string;
   minimumRooms?: number;
   location?: string;
 };
@@ -343,6 +351,7 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       title: property.title,
       operation: property.operation,
       type: property.type,
+      subtype: property.subtype,
       neighborhood: property.neighborhood,
       city: property.city,
       street: property.street,
@@ -361,6 +370,7 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       return (
         (!filters.operation || property.operation === filters.operation) &&
         (!filters.type || property.type === filters.type) &&
+        (!filters.subtype || property.subtype === filters.subtype) &&
         (!location || propertyLocation.includes(location)) &&
         property.rooms >= (filters.minimumRooms || 0)
       );
@@ -370,11 +380,12 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
   const supabase = createPublishedPropertiesClient(url, key);
   let query = supabase
     .from("properties")
-    .select("id,slug,title,operation,property_type,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured")
+    .select("id,slug,title,operation,property_type,property_subtype,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured")
     .eq("status", "published");
 
   if (filters.operation) query = query.eq("operation", filters.operation);
   if (filters.type) query = query.eq("property_type", filters.type);
+  if (filters.subtype) query = query.eq("property_subtype", filters.subtype);
   if (filters.minimumRooms && Number.isFinite(filters.minimumRooms)) {
     query = query.gte("rooms", filters.minimumRooms);
   }

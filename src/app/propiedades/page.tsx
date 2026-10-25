@@ -9,6 +9,7 @@ type SearchParams = Promise<{
   operation?: string;
   location?: string;
   type?: string;
+  subtype?: string;
   rooms?: string;
 }>;
 
@@ -19,6 +20,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: S
   const properties = await getProperties({
     operation: filters.operation,
     type: filters.type,
+    subtype: filters.subtype,
     minimumRooms,
     location: filters.location,
   });

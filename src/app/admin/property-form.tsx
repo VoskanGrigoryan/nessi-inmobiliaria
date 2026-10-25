@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import type { Property } from "@/lib/properties";
+import { propertySubtypes } from "@/lib/property-subtypes";
 import { ImageUploader } from "@/app/admin/image-uploader";
 import { Icon } from "@/components/icon";
 import { Button } from "@/components/button";
@@ -104,12 +105,20 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
               <option value="venta">Venta</option><option value="alquiler">Alquiler</option><option value="alquiler_temporal">Alquiler temporal</option>
             </select>
           </label>
-          <label className={label}>Tipo
-            <select name="property_type" defaultValue={property?.type ?? "Departamento"} className={input}>
-              <option>Departamento</option><option>Casa</option><option>PH</option><option>Otro</option>
-              <option>Lote</option><option>Depósito</option><option>Local comercial</option><option>Cochera</option><option>Oficina</option>
-            </select>
-          </label>
+          <div className="space-y-4">
+            <label className={label}>Tipo de propiedad
+              <select name="property_type" defaultValue={property?.type ?? "Departamento"} className={input}>
+                <option>Departamento</option><option>Casa</option><option>PH</option><option>Otro</option>
+                <option>Lote</option><option>Depósito</option><option>Local comercial</option><option>Cochera</option><option>Oficina</option>
+              </select>
+            </label>
+            <label className={label}>Subtipo de propiedad
+              <select name="property_subtype" defaultValue={property?.subtype ?? ""} className={input}>
+                <option value="">Seleccioná un subtipo</option>
+                {propertySubtypes.map((subtype) => <option key={subtype}>{subtype}</option>)}
+              </select>
+            </label>
+          </div>
           <label className={label}>Ciudad
             <select name="city" value={city} onChange={(event) => {
               setCity(event.target.value as PropertyCity);
