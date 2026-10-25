@@ -10,6 +10,7 @@ import { Icon } from "@/components/icon";
 import { Button } from "@/components/button";
 import { isPropertyCity, isPropertyLocation, propertyLocations, type PropertyCity } from "@/lib/property-locations";
 import { propertyFeatures } from "@/lib/property-features";
+import { propertyAvailabilityLabels, propertyAvailabilityStatuses } from "@/lib/property-availability";
 
 function formatThousands(value: string) {
   const [integer, decimal] = value.split(".");
@@ -260,6 +261,13 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
             <label className="flex items-center gap-3 text-xs font-medium text-slate">Estado
               <select name="status" defaultValue={property?.status ?? "draft"} className="h-10 border border-navy/15 bg-white px-3 text-sm text-navy">
                 <option value="draft">Borrador</option><option value="published">Publicado</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-3 text-xs font-medium text-slate">Disponibilidad
+              <select name="availability_status" defaultValue={property?.availabilityStatus ?? "available"} className="h-10 border border-navy/15 bg-white px-3 text-sm text-navy">
+                {propertyAvailabilityStatuses.map((availability) => (
+                  <option key={availability} value={availability}>{propertyAvailabilityLabels[availability]}</option>
+                ))}
               </select>
             </label>
           </div>

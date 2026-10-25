@@ -10,6 +10,7 @@ import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { formatPrice, getPropertyBySlug, operationBadgeLabels, type BuildingAge } from "@/lib/properties";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getYoutubeEmbedUrl } from "@/lib/youtube";
+import { propertyAvailabilityLabels } from "@/lib/property-availability";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -58,6 +59,11 @@ export default async function PropertyPage({ params }: PageProps) {
             <span className="bg-navy px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-light">
               {operationBadgeLabels[property.operation]}
             </span>
+            {property.availabilityStatus !== "available" && (
+              <span className="border border-navy/15 bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-navy">
+                {propertyAvailabilityLabels[property.availabilityStatus]}
+              </span>
+            )}
             <span className="text-sm text-muted">{property.type}{property.subtype ? ` · ${property.subtype}` : ""} · {address ? `${address} · ` : ""}{property.neighborhood}, {property.city}</span>
           </div>
           <h1 className="mt-4 font-editorial text-3xl leading-tight text-navy sm:text-4xl">{property.title}</h1>

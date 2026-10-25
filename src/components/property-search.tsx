@@ -8,6 +8,10 @@ type SearchValues = {
   type?: string;
   subtype?: string;
   rooms?: string;
+  currency?: string;
+  minimumPrice?: string;
+  maximumPrice?: string;
+  sort?: string;
 };
 
 const controlClass = "h-12 w-full rounded-sm border border-navy/15 bg-white px-3 text-sm text-navy outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20";
@@ -17,7 +21,7 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
     <form
       action="/propiedades"
       method="get"
-      className={`grid gap-3 rounded-sm bg-white p-4 shadow-[0_18px_55px_rgba(1,22,51,0.12)] sm:grid-cols-2 ${compact ? "lg:grid-cols-[1fr_1.35fr_1fr_1fr_0.8fr_auto] lg:items-end" : "lg:grid-cols-[1fr_1.5fr_1fr_1fr_0.8fr_auto] lg:items-end lg:p-6"}`}
+      className={`grid gap-3 rounded-sm bg-white p-4 shadow-[0_18px_55px_rgba(1,22,51,0.12)] sm:grid-cols-2 ${compact ? "lg:grid-cols-[1fr_1.35fr_1fr_1fr_auto] lg:items-end" : "lg:grid-cols-[1fr_1.5fr_1fr_1fr_auto] lg:items-end lg:p-6"}`}
     >
       <label className="block text-xs font-medium text-slate">
         Operación
@@ -59,20 +63,49 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
           {propertySubtypes.map((subtype) => <option key={subtype}>{subtype}</option>)}
         </select>
       </label>
-      <label className="block text-xs font-medium text-slate">
-        Ambientes
-        <select name="rooms" defaultValue={values.rooms ?? ""} className={`${controlClass} mt-2`}>
-          <option value="">Indiferente</option>
-          <option value="1">1 o más</option>
-          <option value="2">2 o más</option>
-          <option value="3">3 o más</option>
-          <option value="4">4 o más</option>
-        </select>
-      </label>
       <Button type="submit" variant="primary" className={`rounded-sm ${compact ? "sm:col-span-2 lg:col-span-1" : "lg:px-7"}`}>
         <Icon name="search" className="size-4" />
         Buscar propiedades
       </Button>
+      <details className="sm:col-span-2 lg:col-span-5" open={Boolean(values.rooms || values.currency || values.minimumPrice || values.maximumPrice || (values.sort && values.sort !== "newest"))}>
+        <summary className="w-fit cursor-pointer py-2 text-sm font-semibold text-navy underline decoration-gold underline-offset-4">Más filtros</summary>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="block text-xs font-medium text-slate">
+            Ambientes
+            <select name="rooms" defaultValue={values.rooms ?? ""} className={`${controlClass} mt-2`}>
+              <option value="">Indiferente</option>
+              <option value="1">1 o más</option>
+              <option value="2">2 o más</option>
+              <option value="3">3 o más</option>
+              <option value="4">4 o más</option>
+            </select>
+          </label>
+          <label className="block text-xs font-medium text-slate">
+            Moneda
+            <select name="currency" defaultValue={values.currency ?? ""} className={`${controlClass} mt-2`}>
+              <option value="">Cualquier moneda</option>
+              <option value="ARS">Pesos argentinos (ARS)</option>
+              <option value="USD">Dólares (USD)</option>
+            </select>
+          </label>
+          <label className="block text-xs font-medium text-slate">
+            Precio mínimo
+            <input type="number" min="0" step="1" name="minimumPrice" defaultValue={values.minimumPrice ?? ""} placeholder="Sin mínimo" className={`${controlClass} mt-2`} />
+          </label>
+          <label className="block text-xs font-medium text-slate">
+            Precio máximo
+            <input type="number" min="0" step="1" name="maximumPrice" defaultValue={values.maximumPrice ?? ""} placeholder="Sin máximo" className={`${controlClass} mt-2`} />
+          </label>
+          <label className="block text-xs font-medium text-slate sm:col-span-2 lg:col-span-1">
+            Ordenar por
+            <select name="sort" defaultValue={values.sort ?? "newest"} className={`${controlClass} mt-2`}>
+              <option value="newest">Más recientes</option>
+              <option value="price_asc">Menor precio</option>
+              <option value="price_desc">Mayor precio</option>
+            </select>
+          </label>
+        </div>
+      </details>
     </form>
   );
 }

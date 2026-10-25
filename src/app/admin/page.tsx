@@ -3,6 +3,7 @@ import { DeletePropertyForm } from "@/app/admin/delete-property-form";
 import { LogoutButton } from "@/app/admin/logout-button";
 import { requireAdminContext } from "@/lib/supabase/admin";
 import { getAdminProperties, formatPrice, operationLabels } from "@/lib/properties";
+import { propertyAvailabilityLabels } from "@/lib/property-availability";
 import { Icon } from "@/components/icon";
 import { RefreshPropertiesButton } from "@/app/admin/refresh-properties-button";
 import { AdminToast } from "@/app/admin/admin-toast";
@@ -96,7 +97,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
                 <span className="text-slate">{operationLabels[property.operation]}</span>
-                <span className="text-slate">{property.status === "published" ? "Publicado" : "Borrador"}</span>
+                <span className="text-slate">{property.status === "published" ? "Publicado" : "Borrador"} · {propertyAvailabilityLabels[property.availabilityStatus]}</span>
                 <span className="font-semibold text-navy">{formatPrice(property.price, property.currency)}</span>
                 <span className="text-slate">{property.rooms} ambientes · {property.area} m²</span>
               </div>
@@ -138,7 +139,10 @@ export default async function AdminPage({ searchParams }: PageProps) {
                   <td className="px-4 py-4 text-center"><CopyPropertyLink href={`/propiedades/${property.slug}`} title={property.title} disabled={property.status !== "published"} /></td>
                   <td className="px-4 py-4 text-slate">{operationLabels[property.operation]}</td>
                   <td className="px-4 py-4 text-slate">{formatPrice(property.price, property.currency)}</td>
-                  <td className="px-4 py-4 text-slate">{property.status === "published" ? "Publicado" : "Borrador"}</td>
+                  <td className="px-4 py-4 text-slate">
+                    <span className="block">{property.status === "published" ? "Publicado" : "Borrador"}</span>
+                    <span className="mt-1 block text-xs text-muted">{propertyAvailabilityLabels[property.availabilityStatus]}</span>
+                  </td>
                   <td className="px-4 py-4"><div className="flex items-center gap-2">
                     <EditPropertyLink href={`/admin/propiedades/${property.id}/editar`} title={property.title} />
                     <DeletePropertyForm id={property.id ?? ""} />

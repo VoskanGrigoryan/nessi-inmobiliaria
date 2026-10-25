@@ -11,18 +11,39 @@ type SearchParams = Promise<{
   type?: string;
   subtype?: string;
   rooms?: string;
+  currency?: string;
+  minimumPrice?: string;
+  maximumPrice?: string;
+  sort?: string;
 }>;
+
+function parsePrice(value?: string) {
+  if (!value?.trim()) return undefined;
+  const price = Number(value);
+  return Number.isFinite(price) && price >= 0 ? price : undefined;
+}
 
 export default async function PropertiesPage({ searchParams }: { searchParams: SearchParams }) {
   const filters = await searchParams;
   const roomsFilter = Number(filters.rooms);
   const minimumRooms = Number.isFinite(roomsFilter) ? roomsFilter || 0 : 0;
+  const currency = filters.currency === "ARS" || filters.currency === "USD" ? filters.currency : undefined;
+  const minimumPrice = parsePrice(filters.minimumPrice);
+  const maximumPrice = parsePrice(filters.maximumPrice);
+  const invalidPriceRange = minimumPrice !== undefined && maximumPrice !== undefined && minimumPrice > maximumPrice;
+  const sort = filters.sort === "price_asc" || filters.sort === "price_desc" ? filters.sort : "newest";
+  const hasPriceCriteria = Boolean(filters.minimumPrice?.trim() || filters.maximumPrice?.trim() || sort !== "newest");
+  const missingCurrency = hasPriceCriteria && !currency;
   const properties = await getProperties({
     operation: filters.operation,
     type: filters.type,
     subtype: filters.subtype,
     minimumRooms,
     location: filters.location,
+    currency,
+    minimumPrice: currency && !invalidPriceRange ? minimumPrice : undefined,
+    maximumPrice: currency && !invalidPriceRange ? maximumPrice : undefined,
+    sort: currency ? sort : "newest",
   });
 
   return (
@@ -39,6 +60,14 @@ export default async function PropertiesPage({ searchParams }: { searchParams: S
         </div>
         <p className="text-sm text-muted">Valores expresados según cada aviso.</p>
       </div>
+
+      {(missingCurrency || invalidPriceRange) && (
+        <p role="status" className="mt-4 text-sm text-amber-800">
+          {invalidPriceRange
+            ? "El precio mínimo debe ser menor o igual al máximo."
+            : "Elegí una moneda para aplicar filtros u ordenar por precio."}
+        </p>
+      )}
 
       {properties.length ? (
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

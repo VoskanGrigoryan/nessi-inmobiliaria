@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PropertyInteractions } from "@/components/property-interactions";
 import { Icon } from "@/components/icon";
 import { formatPrice, operationBadgeLabels, type PropertyCardData } from "@/lib/properties";
+import { propertyAvailabilityLabels } from "@/lib/property-availability";
 
 export function PropertyCard({ property, eager = false }: { property: PropertyCardData; eager?: boolean }) {
   const address = [property.street, property.streetNumber].filter(Boolean).join(" ");
@@ -25,9 +26,16 @@ export function PropertyCard({ property, eager = false }: { property: PropertyCa
             ) : (
               <div className="grid h-full place-items-center text-gold"><Icon name="home" className="size-12" /></div>
             )}
-            <span className="absolute left-3 top-3 bg-navy px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-light">
-              {operationBadgeLabels[property.operation]}
-            </span>
+            <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+              <span className="bg-navy px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-light">
+                {operationBadgeLabels[property.operation]}
+              </span>
+              {property.availabilityStatus === "reserved" && (
+                <span className="bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-navy">
+                  {propertyAvailabilityLabels[property.availabilityStatus]}
+                </span>
+              )}
+            </div>
           </div>
         </Link>
         <div className="absolute right-3 top-3 z-10">

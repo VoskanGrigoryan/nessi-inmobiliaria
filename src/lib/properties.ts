@@ -2,6 +2,7 @@ import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { PropertyFeature } from "@/lib/property-features";
 import type { PropertySubtype } from "@/lib/property-subtypes";
+import type { PropertyAvailabilityStatus } from "@/lib/property-availability";
 
 export type Operation = "venta" | "alquiler" | "alquiler_temporal";
 export const operationLabels: Record<Operation, string> = {
@@ -56,6 +57,7 @@ export type Property = {
   imagePaths?: string[];
   featured?: boolean;
   status?: "published" | "draft";
+  availabilityStatus: PropertyAvailabilityStatus;
 };
 
 export type PropertyCardData = Pick<
@@ -64,6 +66,7 @@ export type PropertyCardData = Pick<
   | "slug"
   | "title"
   | "operation"
+  | "availabilityStatus"
   | "type"
   | "subtype"
   | "neighborhood"
@@ -114,6 +117,7 @@ type PropertyRow = {
   images: string[];
   featured: boolean;
   status: Property["status"];
+  availability_status: PropertyAvailabilityStatus;
 };
 
 type PropertyCardRow = Pick<
@@ -122,6 +126,7 @@ type PropertyCardRow = Pick<
   | "slug"
   | "title"
   | "operation"
+  | "availability_status"
   | "property_type"
   | "property_subtype"
   | "neighborhood"
@@ -160,6 +165,7 @@ export const sampleProperties: Property[] = [
     slug: "departamento-con-balcon-en-palermo",
     title: "Departamento luminoso con balcón",
     operation: "venta",
+    availabilityStatus: "available",
     type: "Departamento",
     neighborhood: "Palermo",
     city: "CABA",
@@ -187,6 +193,7 @@ export const sampleProperties: Property[] = [
     slug: "departamento-moderno-en-belgrano",
     title: "Departamento moderno y funcional",
     operation: "alquiler",
+    availabilityStatus: "available",
     type: "Departamento",
     neighborhood: "Belgrano",
     city: "CABA",
@@ -211,6 +218,7 @@ export const sampleProperties: Property[] = [
     slug: "casa-con-jardin-en-villa-devoto",
     title: "Casa con jardín y espacios abiertos",
     operation: "venta",
+    availabilityStatus: "available",
     type: "Casa",
     neighborhood: "Villa Devoto",
     city: "CABA",
@@ -236,6 +244,7 @@ export const sampleProperties: Property[] = [
     slug: "ph-refaccionado-en-recoleta",
     title: "PH reciclado con detalles originales",
     operation: "venta",
+    availabilityStatus: "available",
     type: "PH",
     neighborhood: "Recoleta",
     city: "CABA",
@@ -298,6 +307,7 @@ function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Pr
     image: gallery[0] ?? "",
     featured: row.featured,
     status: row.status,
+    availabilityStatus: row.availability_status,
   };
 }
 
@@ -311,6 +321,7 @@ function toPropertyCardData(
     slug: row.slug,
     title: row.title,
     operation: row.operation,
+    availabilityStatus: row.availability_status,
     type: row.property_type,
     subtype: row.property_subtype,
     neighborhood: row.neighborhood,
@@ -333,11 +344,15 @@ function escapeLikeFilter(value: string) {
 }
 
 type PropertyFilters = {
+  currency?: Property["currency"];
+  maximumPrice?: number;
   operation?: string;
+  minimumPrice?: number;
   type?: string;
   subtype?: string;
   minimumRooms?: number;
   location?: string;
+  sort?: "newest" | "price_asc" | "price_desc";
 };
 
 export async function getProperties(filters: PropertyFilters = {}): Promise<PropertyCardData[]> {
@@ -350,6 +365,7 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       slug: property.slug,
       title: property.title,
       operation: property.operation,
+      availabilityStatus: property.availabilityStatus,
       type: property.type,
       subtype: property.subtype,
       neighborhood: property.neighborhood,
@@ -368,24 +384,40 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       const location = filters.location?.trim().toLocaleLowerCase("es-AR");
       const propertyLocation = `${property.neighborhood} ${property.city}`.toLocaleLowerCase("es-AR");
       return (
+        ["available", "reserved"].includes(property.availabilityStatus) &&
         (!filters.operation || property.operation === filters.operation) &&
         (!filters.type || property.type === filters.type) &&
         (!filters.subtype || property.subtype === filters.subtype) &&
+        (!filters.currency || property.currency === filters.currency) &&
+        (!filters.currency || filters.minimumPrice === undefined || property.price >= filters.minimumPrice) &&
+        (!filters.currency || filters.maximumPrice === undefined || property.price <= filters.maximumPrice) &&
         (!location || propertyLocation.includes(location)) &&
         property.rooms >= (filters.minimumRooms || 0)
       );
-    });
+    }).sort((left, right) => filters.currency && filters.sort === "price_asc"
+      ? left.price - right.price
+      : filters.currency && filters.sort === "price_desc"
+        ? right.price - left.price
+        : 0);
   }
 
   const supabase = createPublishedPropertiesClient(url, key);
   let query = supabase
     .from("properties")
-    .select("id,slug,title,operation,property_type,property_subtype,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured")
-    .eq("status", "published");
+    .select("id,slug,title,operation,availability_status,property_type,property_subtype,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured")
+    .eq("status", "published")
+    .in("availability_status", ["available", "reserved"]);
 
   if (filters.operation) query = query.eq("operation", filters.operation);
   if (filters.type) query = query.eq("property_type", filters.type);
   if (filters.subtype) query = query.eq("property_subtype", filters.subtype);
+  if (filters.currency) query = query.eq("currency", filters.currency);
+  if (filters.currency && filters.minimumPrice !== undefined && Number.isFinite(filters.minimumPrice)) {
+    query = query.gte("price", filters.minimumPrice);
+  }
+  if (filters.currency && filters.maximumPrice !== undefined && Number.isFinite(filters.maximumPrice)) {
+    query = query.lte("price", filters.maximumPrice);
+  }
   if (filters.minimumRooms && Number.isFinite(filters.minimumRooms)) {
     query = query.gte("rooms", filters.minimumRooms);
   }
@@ -395,7 +427,11 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
     query = query.or(`neighborhood.ilike.${pattern},city.ilike.${pattern}`);
   }
 
-  const { data } = await query.order("created_at", { ascending: false });
+  const { data } = filters.currency && filters.sort === "price_asc"
+    ? await query.order("price", { ascending: true })
+    : filters.currency && filters.sort === "price_desc"
+      ? await query.order("price", { ascending: false })
+      : await query.order("created_at", { ascending: false });
 
   return (data ?? []).map((row) => toPropertyCardData(
       row as PropertyCardRow,

@@ -9,6 +9,7 @@ import { isPropertyLocation } from "@/lib/property-locations";
 import { propertyFeatures } from "@/lib/property-features";
 import { propertySubtypes } from "@/lib/property-subtypes";
 import { isYoutubeUrl } from "@/lib/youtube";
+import { propertyAvailabilityStatuses } from "@/lib/property-availability";
 
 export type LoginState = { error?: "setup" | "invalid" | "unauthorized" };
 
@@ -90,6 +91,7 @@ export async function saveProperty(formData: FormData) {
   const propertySubtype = text(formData, "property_subtype");
   const characteristics = formData.getAll("characteristics").map(String);
   const status = text(formData, "status");
+  const availabilityStatus = text(formData, "availability_status");
   const currency = text(formData, "currency");
   const expensesText = text(formData, "expenses");
   const expenses = expensesText ? Number(expensesText) : null;
@@ -127,6 +129,7 @@ export async function saveProperty(formData: FormData) {
     buildingAges.includes(buildingAge) && videoUrl.length <= 500 && isYoutubeUrl(videoUrl) &&
     new Set(characteristics).size === characteristics.length && characteristics.every((characteristic) => propertyFeatures.includes(characteristic as (typeof propertyFeatures)[number])) &&
     ["USD", "ARS"].includes(currency) && ["draft", "published"].includes(status) &&
+    propertyAvailabilityStatuses.includes(availabilityStatus as (typeof propertyAvailabilityStatuses)[number]) &&
     text(formData, "description").length <= 10000 && safeUploads.length === uploadedPaths.length &&
     new Set(uploadedPaths).size === uploadedPaths.length && new Set(imageOrder).size === imageOrder.length &&
     safeUploads.every((path) => imageOrder.includes(path));
@@ -185,6 +188,7 @@ export async function saveProperty(formData: FormData) {
     images: imageOrder,
     featured: formData.get("featured") === "on",
     status,
+    availability_status: availabilityStatus,
     updated_at: new Date().toISOString(),
   };
   const result = isNew
