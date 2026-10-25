@@ -1,5 +1,6 @@
 import { Icon } from "@/components/icon";
 import { Button } from "@/components/button";
+import { AnimatedDisclosure } from "@/components/animated-disclosure";
 import { propertySubtypes } from "@/lib/property-subtypes";
 
 type SearchValues = {
@@ -67,8 +68,11 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
         <Icon name="search" className="size-4" />
         Buscar propiedades
       </Button>
-      <details className="sm:col-span-2 lg:col-span-5" open={Boolean(values.rooms || values.currency || values.minimumPrice || values.maximumPrice || (values.sort && values.sort !== "newest"))}>
-        <summary className="w-fit cursor-pointer py-2 text-sm font-semibold text-navy underline decoration-gold underline-offset-4">Más filtros</summary>
+      <AnimatedDisclosure
+        className="sm:col-span-2 lg:col-span-5"
+        initiallyOpen={Boolean(values.rooms || values.currency || values.minimumPrice || values.maximumPrice || (values.sort && values.sort !== "newest"))}
+        label="Más filtros"
+      >
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block text-xs font-medium text-slate">
             Ambientes
@@ -105,7 +109,7 @@ export function PropertySearch({ values = {}, compact = false }: { values?: Sear
             </select>
           </label>
         </div>
-      </details>
+      </AnimatedDisclosure>
     </form>
   );
 }
