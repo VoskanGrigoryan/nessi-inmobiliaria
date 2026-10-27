@@ -77,11 +77,17 @@ export async function saveProperty(formData: FormData) {
   const page = isNew ? "nueva" : `${id}/editar`;
   const uploadedPaths = formData.getAll("uploaded_images").map(String);
   const imageOrder = formData.getAll("image_order").map(String);
+  const uploadedFloorPlanPaths = formData.getAll("uploaded_floor_plans").map(String);
+  const floorPlanOrder = formData.getAll("floor_plan_order").map(String);
   const safeUploads = uploadedPaths.filter((path) =>
+    path.startsWith(`${id}/`) && /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/i.test(path),
+  );
+  const safeFloorPlanUploads = uploadedFloorPlanPaths.filter((path) =>
     path.startsWith(`${id}/`) && /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/i.test(path),
   );
   const cleanupUploads = async () => {
     if (safeUploads.length) await supabase.storage.from("property-images").remove(safeUploads);
+    if (safeFloorPlanUploads.length) await supabase.storage.from("property-plans").remove(safeFloorPlanUploads);
   };
 
   const title = text(formData, "title");
@@ -132,7 +138,11 @@ export async function saveProperty(formData: FormData) {
     propertyAvailabilityStatuses.includes(availabilityStatus as (typeof propertyAvailabilityStatuses)[number]) &&
     text(formData, "description").length <= 10000 && safeUploads.length === uploadedPaths.length &&
     new Set(uploadedPaths).size === uploadedPaths.length && new Set(imageOrder).size === imageOrder.length &&
-    safeUploads.every((path) => imageOrder.includes(path));
+    safeUploads.every((path) => imageOrder.includes(path)) &&
+    safeFloorPlanUploads.length === uploadedFloorPlanPaths.length &&
+    new Set(uploadedFloorPlanPaths).size === uploadedFloorPlanPaths.length &&
+    new Set(floorPlanOrder).size === floorPlanOrder.length &&
+    safeFloorPlanUploads.every((path) => floorPlanOrder.includes(path));
 
   if (!valid) {
     await cleanupUploads();
@@ -140,14 +150,19 @@ export async function saveProperty(formData: FormData) {
   }
 
   const { data: oldProperty } = await supabase.from("properties")
-    .select("slug, images").eq("id", id).maybeSingle();
+    .select("slug, images, floor_plans").eq("id", id).maybeSingle();
   if ((isNew && oldProperty) || (!isNew && !oldProperty)) {
     await cleanupUploads();
     redirect(isNew ? "/admin?error=exists" : "/admin?error=missing");
   }
 
   const existingImages = (oldProperty?.images as string[] | undefined) ?? [];
+  const existingFloorPlans = (oldProperty?.floor_plans as string[] | undefined) ?? [];
   if (imageOrder.some((path) => !safeUploads.includes(path) && !existingImages.includes(path))) {
+    await cleanupUploads();
+    redirect(`/admin/propiedades/${page}?error=invalid`);
+  }
+  if (floorPlanOrder.some((path) => !safeFloorPlanUploads.includes(path) && !existingFloorPlans.includes(path))) {
     await cleanupUploads();
     redirect(`/admin/propiedades/${page}?error=invalid`);
   }
@@ -186,6 +201,7 @@ export async function saveProperty(formData: FormData) {
     video_url: videoUrl || null,
     description: text(formData, "description"),
     images: imageOrder,
+    floor_plans: floorPlanOrder,
     featured: formData.get("featured") === "on",
     status,
     availability_status: availabilityStatus,
@@ -209,6 +225,8 @@ export async function saveProperty(formData: FormData) {
 
   const removed = existingImages.filter((path) => !imageOrder.includes(path));
   if (removed.length) await supabase.storage.from("property-images").remove(removed);
+  const removedFloorPlans = existingFloorPlans.filter((path) => !floorPlanOrder.includes(path));
+  if (removedFloorPlans.length) await supabase.storage.from("property-plans").remove(removedFloorPlans);
   updateTag(publishedPropertiesCacheTag);
   revalidatePath("/");
   revalidatePath("/propiedades");
@@ -221,7 +239,7 @@ export async function deleteProperty(formData: FormData) {
   const supabase = await requireAdmin();
   const id = text(formData, "id");
   const { data: property } = await supabase.from("properties")
-    .select("slug, images").eq("id", id).maybeSingle();
+    .select("slug, images, floor_plans").eq("id", id).maybeSingle();
   if (!property) redirect("/admin?error=missing");
 
   const { error } = await supabase.from("properties").delete().eq("id", id);
@@ -229,6 +247,8 @@ export async function deleteProperty(formData: FormData) {
 
   const images = property.images as string[];
   if (images.length) await supabase.storage.from("property-images").remove(images);
+  const floorPlans = property.floor_plans as string[];
+  if (floorPlans.length) await supabase.storage.from("property-plans").remove(floorPlans);
   updateTag(publishedPropertiesCacheTag);
   revalidatePath("/");
   revalidatePath("/propiedades");

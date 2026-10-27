@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import type { Property } from "@/lib/properties";
 import { propertySubtypes } from "@/lib/property-subtypes";
 import { ImageUploader } from "@/app/admin/image-uploader";
+import { FloorPlanUploader } from "@/app/admin/floor-plan-uploader";
 import { Icon } from "@/components/icon";
 import { Button } from "@/components/button";
 import { isPropertyCity, isPropertyLocation, propertyLocations, type PropertyCity } from "@/lib/property-locations";
@@ -32,7 +33,7 @@ function PropertyFormActions({ uploading, property }: { uploading: boolean; prop
   const busy = uploading || pending;
   const iconName = busy ? "refresh" : property ? "check" : "home";
   const buttonLabel = uploading
-    ? "Subiendo fotos…"
+    ? "Subiendo archivos…"
     : pending
       ? (property ? "Guardando cambios…" : "Creando propiedad…")
       : (property ? "Guardar cambios" : "Crear propiedad");
@@ -69,7 +70,9 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
   );
   const [price, setPrice] = useState(property ? String(Math.round(property.price)) : "");
   const [expenses, setExpenses] = useState(property?.expenses == null ? "" : String(property.expenses));
-  const [uploading, setUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [floorPlansUploading, setFloorPlansUploading] = useState(false);
+  const uploading = galleryUploading || floorPlansUploading;
   const input = "mt-1 h-11 w-full border border-navy/15 bg-white px-3 text-sm text-navy outline-none focus:border-gold";
   const label = "block text-xs font-medium text-slate";
   const locations = [...propertyLocations[city]].sort((left, right) => left.localeCompare(right, "es-AR"));
@@ -242,9 +245,13 @@ export function PropertyForm({ property, propertyId, isNew = false, action }: {
         <label className={label}>Video de YouTube (opcional)
           <input type="url" name="video_url" maxLength={500} defaultValue={property?.videoUrl ?? ""} placeholder="https://www.youtube.com/watch?v=..." className={input} />
         </label>
-        <ImageUploader propertyId={propertyId} onUploadingChange={setUploading} images={(property?.gallery ?? []).map((url, index) => ({
+        <ImageUploader propertyId={propertyId} onUploadingChange={setGalleryUploading} images={(property?.gallery ?? []).map((url, index) => ({
           url,
           path: property?.imagePaths?.[index] ?? "",
+        }))} />
+        <FloorPlanUploader propertyId={propertyId} onUploadingChange={setFloorPlansUploading} plans={(property?.floorPlans ?? []).map((url, index) => ({
+          url,
+          path: property?.floorPlanPaths?.[index] ?? "",
         }))} />
       </section>
 

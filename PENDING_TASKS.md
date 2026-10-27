@@ -24,3 +24,11 @@
   5. **Verify the header admin-check cache.** Confirm route changes no longer repeat the `admin_users` request and that the admin link updates after sign-in and sign-out. Continue enforcing admin access on the server.
   6. **Inspect remaining client JavaScript only if browser metrics point there.** The home hero uses Motion, and the gallery/contact form are client components. Check their contribution to transferred and hydrated JavaScript before replacing or splitting anything.
 - **Follow-up:** Recheck the listing LCP and header requests locally, then capture timings for the slowest routes in the deployed environment. Recheck response time and Core Web Vitals after the change.
+
+## Deferred: 360° property panoramas
+
+- **Status:** Deferred; the panorama feature and Pannellum dependency were removed.
+- **Future design:** Give panorama media its own admin upload and stored property field, separate from regular gallery images. Support replacing/removing it and clean up its stored file when the property changes or is deleted.
+- **Viewer candidate:** Pannellum was researched as a lightweight WebGL viewer; check its current documentation and compatibility when resuming.
+- **Input requirement:** Use real equirectangular 360° images. Regular gallery photos cannot provide a full room view.
+- **Open product decision:** Decide whether the first version supports one panorama per property or multiple room scenes with labels and navigation.

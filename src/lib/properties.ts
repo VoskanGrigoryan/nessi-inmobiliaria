@@ -55,6 +55,8 @@ export type Property = {
   image: string;
   gallery: string[];
   imagePaths?: string[];
+  floorPlans?: string[];
+  floorPlanPaths?: string[];
   featured?: boolean;
   status?: "published" | "draft";
   availabilityStatus: PropertyAvailabilityStatus;
@@ -115,6 +117,7 @@ type PropertyRow = {
   video_url: string | null;
   description: string;
   images: string[];
+  floor_plans: string[];
   featured: boolean;
   status: Property["status"];
   availability_status: PropertyAvailabilityStatus;
@@ -266,9 +269,17 @@ export const sampleProperties: Property[] = [
   },
 ];
 
-function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Property {
+function toProperty(
+  row: PropertyRow,
+  getImageUrl: (path: string) => string,
+  getFloorPlanUrl: (path: string) => string,
+): Property {
   const gallery = (row.images ?? []).map((path) =>
     path.startsWith("http") ? path : getImageUrl(path),
+  );
+  const floorPlanPaths = row.floor_plans ?? [];
+  const floorPlans = floorPlanPaths.map((path) =>
+    path.startsWith("http") ? path : getFloorPlanUrl(path),
   );
   return {
     id: row.id,
@@ -304,6 +315,8 @@ function toProperty(row: PropertyRow, getImageUrl: (path: string) => string): Pr
     description: row.description,
     gallery,
     imagePaths: row.images ?? [],
+    floorPlans,
+    floorPlanPaths,
     image: gallery[0] ?? "",
     featured: row.featured,
     status: row.status,
@@ -459,7 +472,11 @@ export const getPropertyBySlug = cache(async (slug: string) => {
   console.info(`[perf] property.detail.query duration_ms=${Math.round(performance.now() - startedAt)}`);
 
   return data
-    ? toProperty(data as PropertyRow, (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl)
+    ? toProperty(
+        data as PropertyRow,
+        (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl,
+        (path) => supabase.storage.from("property-plans").getPublicUrl(path).data.publicUrl,
+      )
     : undefined;
 });
 
@@ -474,7 +491,11 @@ export async function getAdminProperties() {
     .order("created_at", { ascending: false });
 
   return (data ?? []).map((row) =>
-    toProperty(row as PropertyRow, (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl),
+    toProperty(
+      row as PropertyRow,
+      (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl,
+      (path) => supabase.storage.from("property-plans").getPublicUrl(path).data.publicUrl,
+    ),
   );
 }
 

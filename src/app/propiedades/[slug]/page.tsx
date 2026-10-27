@@ -4,6 +4,7 @@ import { BackLink } from "@/components/back-link";
 import { Icon } from "@/components/icon";
 import { ContactForm } from "@/components/contact-form";
 import { PropertyGallery } from "@/components/property-gallery";
+import { PropertyFloorPlans } from "@/components/property-floor-plans";
 import { PropertyAdminEditLink } from "@/components/property-admin-edit-link";
 import { PropertyInteractions } from "@/components/property-interactions";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
@@ -52,6 +53,7 @@ export default async function PropertyPage({ params }: PageProps) {
       {property.gallery.length
         ? <PropertyGallery images={property.gallery} title={property.title} />
         : <div className="grid min-h-72 place-items-center rounded-sm bg-sand text-gold"><Icon name="home" className="size-16" /></div>}
+      <PropertyFloorPlans plans={property.floorPlans ?? []} title={property.title} />
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div>
