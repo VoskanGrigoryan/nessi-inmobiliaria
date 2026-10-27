@@ -368,12 +368,18 @@ type PropertyFilters = {
   sort?: "newest" | "price_asc" | "price_desc";
 };
 
-export async function getProperties(filters: PropertyFilters = {}): Promise<PropertyCardData[]> {
+type PropertyListResult = { properties: PropertyCardData[]; total: number };
+type Pagination = { page: number; pageSize: number };
+
+async function getPropertyResults(
+  filters: PropertyFilters = {},
+  pagination?: Pagination,
+): Promise<PropertyListResult> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
     const properties = process.env.NODE_ENV === "production" ? [] : sampleProperties;
-    return properties.map((property) => ({
+    const filtered = properties.map((property) => ({
       id: property.id,
       slug: property.slug,
       title: property.title,
@@ -412,12 +418,20 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
       : filters.currency && filters.sort === "price_desc"
         ? right.price - left.price
         : 0);
+    const total = filtered.length;
+    const start = pagination ? (pagination.page - 1) * pagination.pageSize : 0;
+    return {
+      properties: pagination ? filtered.slice(start, start + pagination.pageSize) : filtered,
+      total,
+    };
   }
 
   const supabase = createPublishedPropertiesClient(url, key);
-  let query = supabase
-    .from("properties")
-    .select("id,slug,title,operation,availability_status,property_type,property_subtype,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured")
+  const fields = "id,slug,title,operation,availability_status,property_type,property_subtype,neighborhood,city,street,street_number,price,expenses,currency,rooms,bathrooms,area,images,featured";
+  let query = pagination
+    ? supabase.from("properties").select(fields, { count: "exact" })
+    : supabase.from("properties").select(fields);
+  query = query
     .eq("status", "published")
     .in("availability_status", ["available", "reserved"]);
 
@@ -440,16 +454,40 @@ export async function getProperties(filters: PropertyFilters = {}): Promise<Prop
     query = query.or(`neighborhood.ilike.${pattern},city.ilike.${pattern}`);
   }
 
-  const { data } = filters.currency && filters.sort === "price_asc"
-    ? await query.order("price", { ascending: true })
+  const orderedQuery = filters.currency && filters.sort === "price_asc"
+    ? query.order("price", { ascending: true })
     : filters.currency && filters.sort === "price_desc"
-      ? await query.order("price", { ascending: false })
-      : await query.order("created_at", { ascending: false });
-
-  return (data ?? []).map((row) => toPropertyCardData(
-      row as PropertyCardRow,
+      ? query.order("price", { ascending: false })
+      : query.order("created_at", { ascending: false });
+  const mapProperties = (rows: PropertyCardRow[] | null) => (rows ?? []).map((row) =>
+    toPropertyCardData(
+      row,
       (path) => supabase.storage.from("property-images").getPublicUrl(path).data.publicUrl,
-    ));
+    ),
+  );
+
+  if (pagination) {
+    const start = (pagination.page - 1) * pagination.pageSize;
+    const { data, count } = await orderedQuery.range(start, start + pagination.pageSize - 1);
+    return { properties: mapProperties(data as PropertyCardRow[] | null), total: count ?? 0 };
+  }
+
+  const { data } = await orderedQuery;
+  const mapped = mapProperties(data as PropertyCardRow[] | null);
+  return { properties: mapped, total: mapped.length };
+}
+
+export async function getProperties(filters: PropertyFilters = {}): Promise<PropertyCardData[]> {
+  return (await getPropertyResults(filters)).properties;
+}
+
+export async function getPaginatedProperties(
+  filters: PropertyFilters,
+  page: number,
+  pageSize = 9,
+): Promise<PropertyListResult> {
+  const normalizedPage = Number.isSafeInteger(page) && page > 0 ? page : 1;
+  return getPropertyResults(filters, { page: normalizedPage, pageSize });
 }
 
 export const getPropertyBySlug = cache(async (slug: string) => {
