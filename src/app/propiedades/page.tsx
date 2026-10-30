@@ -45,11 +45,13 @@ export default async function PropertiesPage({ searchParams }: { searchParams: S
   const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const roomsFilter = Number(filters.rooms);
   const minimumRooms = Number.isFinite(roomsFilter) ? roomsFilter || 0 : 0;
-  const currency = filters.currency === "ARS" || filters.currency === "USD" ? filters.currency : undefined;
+  const currency: "ARS" | "USD" | undefined =
+    filters.currency === "ARS" ? "ARS" : filters.currency === "USD" ? "USD" : undefined;
   const minimumPrice = parsePrice(filters.minimumPrice);
   const maximumPrice = parsePrice(filters.maximumPrice);
   const invalidPriceRange = minimumPrice !== undefined && maximumPrice !== undefined && minimumPrice > maximumPrice;
-  const sort = filters.sort === "price_asc" || filters.sort === "price_desc" ? filters.sort : "newest";
+  const sort: "newest" | "price_asc" | "price_desc" =
+    filters.sort === "price_asc" || filters.sort === "price_desc" ? filters.sort : "newest";
   const hasPriceCriteria = Boolean(filters.minimumPrice?.trim() || filters.maximumPrice?.trim() || sort !== "newest");
   const missingCurrency = hasPriceCriteria && !currency;
   const propertyFilters = {
