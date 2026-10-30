@@ -1,0 +1,158 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/icon";
+import { Button } from "@/components/button";
+
+export function PropertyGallery({ images, title }: { images: string[]; title: string }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(() => new Set());
+  const [failedImages, setFailedImages] = useState<Set<number>>(() => new Set());
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const isOpen = activeIndex !== null;
+  const activeImage = activeIndex === null ? null : images[activeIndex];
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (activeIndex !== null && dialog && !dialog.open) dialog.showModal();
+    if (activeIndex === null && dialog?.open) dialog.close();
+  }, [activeIndex]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const bodyOverflow = document.body.style.overflow;
+    const documentOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = bodyOverflow;
+      document.documentElement.style.overflow = documentOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (activeIndex === null) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setActiveIndex((current) => current === null ? null : (current - 1 + images.length) % images.length);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setActiveIndex((current) => current === null ? null : (current + 1) % images.length);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeIndex, images.length]);
+
+  function showImage(index: number) {
+    setActiveIndex(index);
+  }
+
+  function moveImage(direction: -1 | 1) {
+    setActiveIndex((current) => current === null ? null : (current + direction + images.length) % images.length);
+  }
+
+  return (
+    <>
+      <div className={`grid gap-3 overflow-hidden sm:rounded-sm ${images.length > 1 ? "sm:grid-cols-[1.6fr_1fr]" : ""}`}>
+        <Button
+          variant="custom"
+          type="button"
+          aria-label={`Ampliar foto 1 de ${title}`}
+          onClick={() => showImage(0)}
+          className={`group relative block w-full cursor-zoom-in overflow-hidden bg-sand transition-transform duration-150 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none motion-reduce:active:scale-100 ${images.length > 1 ? "aspect-[1.45] sm:aspect-auto sm:min-h-[420px]" : "mx-auto aspect-[1.45] sm:aspect-[1.7] sm:max-w-5xl"}`}
+        >
+          <Image src={images[0]} alt={title} fill priority sizes="(max-width: 640px) 100vw, 65vw" className={`${images.length > 1 ? "object-cover" : "object-contain"} transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100`} />
+          <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+            <Icon name="expand" className="size-4" />
+          </span>
+        </Button>
+
+        {images.length > 1 && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
+            {images.slice(1, 3).map((image, index) => (
+              <Button
+                variant="custom"
+                key={index}
+                type="button"
+                aria-label={`Ampliar foto ${index + 2} de ${title}`}
+                onClick={() => showImage(index + 1)}
+                className="group relative block aspect-[1.5] w-full cursor-zoom-in overflow-hidden bg-sand transition-transform duration-150 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none motion-reduce:active:scale-100 sm:aspect-auto sm:min-h-[204px]"
+              >
+                <Image src={image} alt={`${title}, foto ${index + 2}`} fill sizes="(max-width: 640px) 50vw, 35vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
+                <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-navy/75 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+                  <Icon name="expand" className="size-4" />
+                </span>
+              </Button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <dialog
+        ref={dialogRef}
+        aria-label={`Galería de ${title}`}
+        onCancel={(event) => {
+          event.preventDefault();
+          dialogRef.current?.close();
+        }}
+        onClose={() => setActiveIndex(null)}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) dialogRef.current?.close();
+        }}
+        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none overflow-hidden border-0 bg-transparent p-0 text-white backdrop:bg-navy/35 backdrop:backdrop-blur-md"
+      >
+        {activeImage && activeIndex !== null && (
+          <div className="relative flex h-full items-center justify-center p-5 sm:p-12">
+            <div className="relative h-[78vh] w-full bg-navy/10">
+              {!loadedImages.has(activeIndex) && !failedImages.has(activeIndex) && (
+                <div role="status" className="absolute inset-0 z-10 grid place-items-center text-sm text-white">
+                  <span className="inline-flex items-center gap-2 rounded bg-navy/70 px-4 py-3">
+                    <Icon name="refresh" className="size-4 animate-spin motion-reduce:animate-none" />
+                    Cargando foto…
+                  </span>
+                </div>
+              )}
+              {failedImages.has(activeIndex) && (
+                <div role="alert" className="absolute inset-0 z-10 grid place-items-center text-sm text-white">
+                  <span className="rounded bg-navy/70 px-4 py-3">No se pudo cargar la foto.</span>
+                </div>
+              )}
+              <Image
+                key={activeIndex}
+                src={activeImage}
+                alt={`${title}, foto ${activeIndex + 1}`}
+                fill
+                priority
+                sizes="100vw"
+                onLoad={() => setLoadedImages((current) => new Set(current).add(activeIndex))}
+                onError={() => setFailedImages((current) => new Set(current).add(activeIndex))}
+                className={`gallery-image-enter object-contain transition-opacity duration-150 motion-reduce:transition-none ${loadedImages.has(activeIndex) ? "opacity-100" : "opacity-0"}`}
+              />
+            </div>
+
+            <Button variant="custom" type="button" aria-label="Cerrar galería" onClick={() => dialogRef.current?.close()} className="absolute right-4 top-4 z-10 grid size-11 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white">
+              <Icon name="close" className="size-6" />
+            </Button>
+            {images.length > 1 && (
+              <>
+                <Button variant="custom" type="button" aria-label="Foto anterior" onClick={() => moveImage(-1)} className="absolute left-3 top-1/2 z-10 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white sm:left-5">
+                  <Icon name="previous" className="size-6" />
+                </Button>
+                <Button variant="custom" type="button" aria-label="Foto siguiente" onClick={() => moveImage(1)} className="absolute right-3 top-1/2 z-10 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white sm:right-5">
+                  <Icon name="next" className="size-6" />
+                </Button>
+              </>
+            )}
+            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-sm text-white/80">
+              {(activeIndex ?? 0) + 1} / {images.length}
+            </p>
+          </div>
+        )}
+      </dialog>
+    </>
+  );
+}

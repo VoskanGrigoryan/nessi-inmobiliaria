@@ -1,16 +1,33 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderAuthProvider } from "@/components/site-header-auth";
+import { PropertyFavoritesProvider } from "@/components/property-favorites";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nessi Inmobiliaria",
-  description: "Encontrá tu próximo hogar con Nessi Inmobiliaria.",
+  title: {
+    default: "RN Negocios Inmobiliarios",
+    template: "%s | RN Negocios Inmobiliarios",
+  },
+  description: "Propiedades en venta, alquiler y alquiler temporal con el asesoramiento cercano de Rosana Nessi.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-stone-50 text-stone-950 antialiased">
-        {children}
+      <body className="flex min-h-screen flex-col bg-paper text-navy antialiased">
+        <SiteHeaderAuthProvider>
+          <PropertyFavoritesProvider>
+            <SiteHeader />
+            <div className="flex flex-1 flex-col">{children}</div>
+          </PropertyFavoritesProvider>
+        </SiteHeaderAuthProvider>
+        <SiteFooter />
+        <WhatsAppFloat />
+        <Analytics />
       </body>
     </html>
   );
