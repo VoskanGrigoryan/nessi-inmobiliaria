@@ -24,7 +24,15 @@ function formatBuildingAge(age: BuildingAge) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const property = await getPropertyBySlug(slug);
-  return { title: property?.title ?? "Propiedad" };
+  if (!property) {
+    return { title: "Propiedad", description: "Consultá propiedades en venta y alquiler con Nessi Inmobiliaria." };
+  }
+
+  const location = [property.neighborhood, property.city].filter(Boolean).join(", ");
+  return {
+    title: property.title,
+    description: `${operationBadgeLabels[property.operation]}: ${property.title}${location ? ` en ${location}` : ""}. Consultá detalles y fotos con Nessi Inmobiliaria.`,
+  };
 }
 
 export default async function PropertyPage({ params }: PageProps) {

@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
-export const metadata: Metadata = { title: "Contacto" };
+export const metadata: Metadata = {
+  title: "Contacto",
+  description: "Contactá a Nessi Inmobiliaria para recibir asesoramiento personalizado sobre compra, venta o alquiler de propiedades.",
+};
 
 export default function ContactPage() {
   return (

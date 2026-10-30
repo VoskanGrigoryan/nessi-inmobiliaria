@@ -4,7 +4,10 @@ import { PropertyCard } from "@/components/property-card";
 import { PropertySearch } from "@/components/property-search";
 import { getPaginatedProperties } from "@/lib/properties";
 
-export const metadata: Metadata = { title: "Propiedades" };
+export const metadata: Metadata = {
+  title: "Propiedades",
+  description: "Explorá propiedades en venta y alquiler. Encontrá opciones según tus necesidades con el asesoramiento de Nessi Inmobiliaria.",
+};
 
 type SearchParams = Promise<{
   operation?: string;

@@ -3,7 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
 
-export const metadata: Metadata = { title: "Nosotros" };
+export const metadata: Metadata = {
+  title: "Nosotros",
+  description: "Conocé a Rosana Nessi y su equipo: asesoramiento profesional y atención personalizada en cada operación inmobiliaria.",
+};
 
 const values = [
   {
@@ -59,7 +62,7 @@ export default function AboutPage() {
       <section className="bg-paper">
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
           <div className="max-w-4xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">RN Negocios Inmobiliarios</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Nessi Inmobiliaria</p>
             <h1 className="mt-4 max-w-3xl font-editorial text-4xl leading-tight text-navy sm:text-6xl">
               Tu próxima decisión inmobiliaria, con claridad y respaldo.
             </h1>
@@ -119,7 +122,7 @@ export default function AboutPage() {
                 </div>
                 <Image
                   src="/rosana-nessi-logo.png"
-                  alt="Rosana Nessi Negocios Inmobiliarios"
+                  alt="Nessi Inmobiliaria, de Rosana Nessi"
                   width={433}
                   height={408}
                   className="h-40 w-40 justify-self-center object-contain lg:h-48 lg:w-48 lg:justify-self-end"
@@ -133,7 +136,7 @@ export default function AboutPage() {
             <div aria-hidden="true" className="absolute inset-0 bg-navy/60" />
             <div className="relative flex min-h-[24rem] items-center p-7 sm:p-10 lg:p-14">
               <p className="max-w-lg text-base leading-8 text-white sm:text-lg">
-                En RN Negocios Inmobiliarios creemos que vender o comprar una propiedad es mucho m&aacute;s que una transacci&oacute;n. Por eso ofrecemos un servicio basado en la confianza, la transparencia, el asesoramiento profesional y el compromiso permanente con nuestros clientes, acompa&ntilde;&aacute;ndolos en cada paso del proceso hasta alcanzar sus objetivos.
+                En Nessi Inmobiliaria creemos que vender o comprar una propiedad es mucho m&aacute;s que una transacci&oacute;n. Por eso ofrecemos un servicio basado en la confianza, la transparencia, el asesoramiento profesional y el compromiso permanente con nuestros clientes, acompa&ntilde;&aacute;ndolos en cada paso del proceso hasta alcanzar sus objetivos.
               </p>
             </div>
           </div>

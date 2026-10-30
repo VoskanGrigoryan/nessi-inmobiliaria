@@ -14,12 +14,12 @@ export function SiteHeader() {
   return (
     <SiteHeaderVisibility>
       <>
-        <header className="border-b border-gold/25 bg-navy">
+        <header className="sticky top-0 z-50 border-b border-gold/25 bg-navy">
           <div className="flex w-full items-center justify-between gap-6 px-5 py-2.5">
-            <Link href="/" aria-label="Rosana Nessi Negocios Inmobiliarios, inicio" className="flex shrink-0 items-center">
+            <Link href="/" aria-label="Nessi Inmobiliaria, inicio" className="flex shrink-0 items-center">
               <Image
                 src="/rosana-nessi-mark.png"
-                alt="Rosana Nessi Negocios Inmobiliarios"
+                alt="Nessi Inmobiliaria, de Rosana Nessi"
                 width={228}
                 height={147}
                 priority

@@ -9,10 +9,13 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "RN Negocios Inmobiliarios",
-    template: "%s | RN Negocios Inmobiliarios",
+    default: "Nessi Inmobiliaria",
+    template: "%s | Nessi Inmobiliaria",
   },
-  description: "Propiedades en venta, alquiler y alquiler temporal con el asesoramiento cercano de Rosana Nessi.",
+  description: "Nessi Inmobiliaria, de Rosana Nessi. Asesoramiento personalizado para comprar, vender o alquilar propiedades.",
+  verification: {
+    google: "PjdvfJSB-zQRe4W-E3Z7ERWpMyCWg3FuIPhBrotCms0",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

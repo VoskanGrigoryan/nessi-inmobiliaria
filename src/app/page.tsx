@@ -33,7 +33,7 @@ export default async function Home() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="max-w-2xl text-white">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-gold-light sm:text-sm">
-              RN Negocios Inmobiliarios
+              Nessi Inmobiliaria
             </p>
             <h1 className="mt-5 font-editorial text-4xl leading-[1.12] sm:text-6xl lg:text-7xl">
               Encontrá tu lugar en Buenos Aires.
